@@ -7,11 +7,16 @@
 # MFAST_<component>_LIBRARY - particular component library
 # MFAST_EXECUTABLE          - the fast_type_gen executable
 
+include(FindPackageHandleStandardArgs)
+
 # Compute paths
 get_filename_component(MFAST_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
 include("${MFAST_CMAKE_DIR}/mFASTTargets.cmake")
 
-find_package( Boost 1.55.0 )
+if (NOT Boost_FOUND)
+  find_package(Boost 1.59.0 REQUIRED)
+endif()
+
 set(MFAST_INCLUDE_DIR "${Boost_INCLUDE_DIR}")
 foreach (directory @CONF_INCLUDE_DIRS@)
   get_filename_component(directory "${directory}" ABSOLUTE)
@@ -51,6 +56,12 @@ foreach (entry IN LISTS mFAST_FIND_COMPONENTS)
 
     set(MFAST_USED_COMPONENTS "${MFAST_USED_COMPONENTS} ${entry}")
     set("MFAST_${entry}_LIBRARY" "mfast_${entry}${STATIC_SUFFIX}")
+    if (NOT TARGET mFAST::${entry})
+      add_library(mFAST::${entry} INTERFACE IMPORTED)
+      set_target_properties(mFAST::${entry} PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${MFAST_INCLUDE_DIR}"
+        INTERFACE_LINK_LIBRARIES mfast_${entry}${STATIC_SUFFIX})
+    endif()
   else ()
     message(SEND_ERROR "mFAST component ${entry} NOT FOUND! Available components: ${components}")
   endif ()
@@ -58,8 +69,20 @@ endforeach (entry)
 
 list(APPEND MFAST_LIBRARIES "mfast${STATIC_SUFFIX}")
 
-message(STATUS "mFAST Found! Used components:${MFAST_USED_COMPONENTS}")
-message(STATUS "Used libraries: ${MFAST_LIBRARIES}")
+if (NOT TARGET mFAST::mFAST)
+  add_library(mFAST::mFAST INTERFACE IMPORTED)
+  set_target_properties(mFAST::mFAST PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${MFAST_INCLUDE_DIR}"
+    INTERFACE_LINK_LIBRARIES "${MFAST_LIBRARIES}")
+endif()
+
+mark_as_advanced(MFAST_INCLUDE_DIR)
+mark_as_advanced(MFAST_LIBRARIES)
+
+find_package_handle_standard_args(mFAST
+  REQUIRED_VARS
+    MFAST_LIBRARIES
+    MFAST_INCLUDE_DIR)
 
 include("${MFAST_CMAKE_DIR}/FastTypeGenTarget.cmake")
 include("${MFAST_CMAKE_DIR}/SetCXXStandard.cmake")
