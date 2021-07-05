@@ -29,19 +29,23 @@ configure_file(${PROJECT_SOURCE_DIR}/cmake/mFASTConfigVersion.cmake.in
                "${PROJECT_BINARY_DIR}/mFASTConfigVersion.cmake"
                @ONLY)
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/FastTypeGenTarget.cmake 
+configure_file(${PROJECT_SOURCE_DIR}/cmake/FastTypeGenLib.cmake
+               FastTypeGenLib.cmake COPYONLY)
+
+configure_file(${PROJECT_SOURCE_DIR}/cmake/FastTypeGenTarget.cmake
                FastTypeGenTarget.cmake COPYONLY)
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/SetCXXStandard.cmake 
+configure_file(${PROJECT_SOURCE_DIR}/cmake/SetCXXStandard.cmake
                SetCXXStandard.cmake COPYONLY)
-               
+
 # Install the mFASTConfig.cmake and mFASTConfigVersion.cmake
 install(FILES
   "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mFASTConfig.cmake"
   "${PROJECT_BINARY_DIR}/mFASTConfigVersion.cmake"
+  "${PROJECT_SOURCE_DIR}/cmake/FastTypeGenLib.cmake"
   "${PROJECT_SOURCE_DIR}/cmake/FastTypeGenTarget.cmake"
   "${PROJECT_SOURCE_DIR}/cmake/SetCXXStandard.cmake"
   DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
-  
+
 # Install the export set for use with the install-tree
 install(EXPORT mFASTTargets DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)

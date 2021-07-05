@@ -84,5 +84,6 @@ find_package_handle_standard_args(mFAST
     MFAST_LIBRARIES
     MFAST_INCLUDE_DIR)
 
+include("${MFAST_CMAKE_DIR}/FastTypeGenLib.cmake")
 include("${MFAST_CMAKE_DIR}/FastTypeGenTarget.cmake")
 include("${MFAST_CMAKE_DIR}/SetCXXStandard.cmake")
