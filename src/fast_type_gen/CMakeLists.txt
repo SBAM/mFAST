@@ -1,4 +1,3 @@
-
 if (NOT CMAKE_CROSSCOMPILING)
   set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
   add_executable (fast_type_gen
@@ -12,6 +11,13 @@ if (NOT CMAKE_CROSSCOMPILING)
                          mfast_xml_parser_static
                          mfast_static
                          mfast_coder_static)
+
+  if (STATIC_GEN AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_options(fast_type_gen
+      PRIVATE
+        -static-libgcc
+        -static-libstdc++)
+  endif()
 
   set_target_properties(fast_type_gen PROPERTIES VERSION "${MFAST_VERSION}")
 
@@ -30,11 +36,9 @@ else()
                       BUILD_COMMAND ${CMAKE_COMMAND} --build . --target install.fast_type_gen
                       BUILD_BYPRODUCTS ${PROJECT_BINARY_DIR}/bin/fast_type_gen
                       INSTALL_COMMAND "")
-  
+
   add_executable(fast_type_gen IMPORTED GLOBAL)
   set_property(TARGET fast_type_gen PROPERTY IMPORTED_LOCATION ${PROJECT_BINARY_DIR}/bin/fast_type_gen)
   add_dependencies(fast_type_gen native_mfast)
-  
-endif()
 
-  
+endif()
