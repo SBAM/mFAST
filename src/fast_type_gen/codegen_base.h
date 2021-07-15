@@ -5,7 +5,7 @@
 // See the file license.txt for licensing information.
 #pragma once
 
-#include <string>
+#include <string_view>
 #include <boost/exception/all.hpp>
 #include <mfast.h>
 #include <mfast/xml_parser/dynamic_templates_description.h>
@@ -38,7 +38,7 @@ public:
   void set_generate_comment(bool generateComment);
 
   static std::string cpp_name(const mfast::field_instruction* inst);
-  static std::string cpp_name(boost::string_ref n);
+  static std::string cpp_name(std::string_view n);
   static const  mfast::field_instruction* get_element_instruction(const mfast::sequence_field_instruction* inst);
 protected:
   void generate_comment();

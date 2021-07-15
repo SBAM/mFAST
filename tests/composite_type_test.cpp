@@ -24,6 +24,8 @@
 #include "debug_allocator.h"
 #include <boost/foreach.hpp>
 #include <boost/assign/list_of.hpp> // for 'list_of()'
+
+using namespace std::string_view_literals;
 using namespace boost::assign; // bring 'list_of()' into scope
 
 
@@ -72,10 +74,10 @@ TEST_CASE("test the operations of sequence_mref","[test_sequence]")
 
   Emails emails;
 
-  boost::string_ref values[] = {
-    "test1@.email.com",
-    "test2@.email.com",
-    "test3@.email.com",
+  std::string_view values[] = {
+    "test1@.email.com"sv,
+    "test2@.email.com"sv,
+    "test3@.email.com"sv,
   };
 
   emails.mref().assign(values, values+3);

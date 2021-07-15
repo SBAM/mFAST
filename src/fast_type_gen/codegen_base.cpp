@@ -94,7 +94,7 @@ std::string codegen_base::cpp_name(const mfast::field_instruction *inst) {
   return cpp_name(inst->name());
 }
 
-std::string codegen_base::cpp_name(boost::string_ref name)
+std::string codegen_base::cpp_name(std::string_view name)
 {
   std::string result;
   if (!std::isalpha(name[0]))

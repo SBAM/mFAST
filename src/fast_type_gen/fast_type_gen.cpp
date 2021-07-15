@@ -163,9 +163,9 @@ int main(int argc, const char **argv) {
 #ifdef _WINDOWS
       char filebase_buf[_MAX_FNAME];
       _splitpath(argv[i], NULL, NULL, filebase_buf, NULL);
-      boost::string_ref filebase = static_cast<const char*>(filebase_buf);
+      std::string_view filebase = static_cast<const char*>(filebase_buf);
 #else
-      boost::string_ref filebase(argv[i]);
+      std::string_view filebase(argv[i]);
       filebase = filebase.substr(filebase.find_last_of('/') + 1);
       filebase = filebase.substr(0, filebase.find_last_of('.'));
 #endif

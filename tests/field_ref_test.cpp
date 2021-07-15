@@ -28,6 +28,7 @@
 #include <mfast/coder/common/codec_helper.h>
 #include "debug_allocator.h"
 
+using namespace std::string_view_literals;
 using namespace mfast;
 
 
@@ -643,14 +644,14 @@ TEST_CASE("test the operations of string_field","[string_field_test]")
     string_holder1.mref().as("abc");
 
     REQUIRE(string_holder1.cref().size() ==  3U);
-    REQUIRE(boost::string_ref("abc") ==  string_holder1.cref().value());
+    REQUIRE("abc"sv ==  string_holder1.cref().value());
 
 
     string_holder2.mref().as("def");
     string_holder1.mref().swap(string_holder2.mref());
 
-    REQUIRE(boost::string_ref("def") ==  string_holder1.cref().value());
-    REQUIRE(boost::string_ref("abc") ==  string_holder2.cref().value());
+    REQUIRE("def"sv ==  string_holder1.cref().value());
+    REQUIRE("abc"sv ==  string_holder2.cref().value());
   }
 
   inst.destruct_value(storage, &alloc);

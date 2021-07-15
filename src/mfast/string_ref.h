@@ -5,10 +5,9 @@
 // See the file license.txt for licensing information.
 #pragma once
 
-#include <string>
+#include <string_view>
 #include "field_ref.h"
 #include "vector_ref.h"
-#include <boost/utility/string_ref.hpp>
 
 namespace mfast {
 template <typename Instruction>
@@ -25,10 +24,10 @@ public:
   explicit string_cref_base(const field_cref &other)
       : vector_cref_base<char, Instruction>(other) {}
 
-  boost::string_ref value() const {
-    return boost::string_ref(this->data(), this->size());
+  std::string_view value() const {
+    return std::string_view(this->data(), this->size());
   }
-  bool operator==(const boost::string_ref &other) const {
+  bool operator==(const std::string_view &other) const {
     return compare(other) == 0;
   }
   template <typename OtherIntruction>
@@ -36,7 +35,7 @@ public:
     return compare(other) == 0;
   }
 
-  bool operator!=(const boost::string_ref &other) const {
+  bool operator!=(const std::string_view &other) const {
     return compare(other) != 0;
   }
   template <typename OtherIntruction>
@@ -44,7 +43,7 @@ public:
     return compare(other) != 0;
   }
 
-  bool operator>(const boost::string_ref &other) const {
+  bool operator>(const std::string_view &other) const {
     return compare(other) > 0;
   }
   template <typename OtherIntruction>
@@ -52,7 +51,7 @@ public:
     return compare(other) >= 0;
   }
 
-  bool operator>=(const boost::string_ref &other) const {
+  bool operator>=(const std::string_view &other) const {
     return compare(other) >= 0;
   }
   template <typename OtherIntruction>
@@ -60,7 +59,7 @@ public:
     return compare(other) >= 0;
   }
 
-  bool operator<(const boost::string_ref &other) const {
+  bool operator<(const std::string_view &other) const {
     return compare(other) < 0;
   }
   template <typename OtherIntruction>
@@ -68,7 +67,7 @@ public:
     return compare(other) < 0;
   }
 
-  bool operator<=(const boost::string_ref &other) const {
+  bool operator<=(const std::string_view &other) const {
     return compare(other) <= 0;
   }
   template <typename OtherIntruction>
@@ -76,7 +75,7 @@ public:
     return compare(other) <= 0;
   }
 
-  int compare(const boost::string_ref &other) const {
+  int compare(const std::string_view &other) const {
     return this->value().compare(other);
   }
   template <typename OtherIntruction>
@@ -166,10 +165,10 @@ public:
       this->assign(s.begin(), s.end());
   }
 
-  void as(const boost::string_ref &s) const {
+  void as(const std::string_view &s) const {
     this->assign(s.begin(), s.end());
   }
-  void refers_to(const boost::string_ref &s) const {
+  void refers_to(const std::string_view &s) const {
     base_type::refers_to(s.data(), s.size());
   }
   void shallow_assign(const char *str) const {
@@ -193,17 +192,17 @@ public:
   vector_mref(const vector_mref<char> &) = default;
 
   explicit vector_mref(const field_mref_base &other) : base_type(other) {}
-  vector_mref &operator=(const boost::string_ref &s) {
+  vector_mref &operator=(const std::string_view &s) {
     this->assign(s.begin(), s.end());
     return *this;
   }
 
-  const vector_mref &append(const boost::string_ref &str) const {
+  const vector_mref &append(const std::string_view &str) const {
     this->insert(this->end(), str.begin(), str.end());
     return *this;
   }
 
-  const vector_mref &append(const boost::string_ref &str, size_t subpos,
+  const vector_mref &append(const std::string_view &str, size_t subpos,
                             size_t sublen) const {
     this->insert(this->end(), &str[subpos], &str[subpos + sublen]);
     return *this;
@@ -225,7 +224,7 @@ public:
     return *this;
   }
 
-  const vector_mref &operator+=(const boost::string_ref &str) const {
+  const vector_mref &operator+=(const std::string_view &str) const {
     return this->append(str);
   }
   const vector_mref &operator+=(char c) const { return this->append(1, c); }
@@ -245,17 +244,17 @@ public:
 
   vector_mref(const vector_mref<utf8_char> &other) : base_type(other) {}
   explicit vector_mref(const field_mref_base &other) : base_type(other) {}
-  vector_mref &operator=(const boost::string_ref &s) {
+  vector_mref &operator=(const std::string_view &s) {
     this->assign(s.begin(), s.end());
     return *this;
   }
 
-  const vector_mref &append(const boost::string_ref &str) const {
+  const vector_mref &append(const std::string_view &str) const {
     this->insert(this->end(), str.begin(), str.end());
     return *this;
   }
 
-  const vector_mref &append(const boost::string_ref &str, size_t subpos,
+  const vector_mref &append(const std::string_view &str, size_t subpos,
                             size_t sublen) const {
     this->insert(this->end(), &str[subpos], &str[subpos + sublen]);
     return *this;
@@ -277,7 +276,7 @@ public:
     return *this;
   }
 
-  const vector_mref &operator+=(const boost::string_ref &str) const {
+  const vector_mref &operator+=(const std::string_view &str) const {
     return this->append(str);
   }
   const vector_mref &operator+=(char c) const { return this->append(1, c); }
@@ -299,17 +298,17 @@ public:
   operator string_cref<T>() const {
     return string_cref<T>(this->storage(), this->instruction());
   }
-  string_mref &operator=(const boost::string_ref &s) {
+  string_mref &operator=(const std::string_view &s) {
     this->assign(s.begin(), s.end());
     return *this;
   }
 
-  const string_mref &append(const boost::string_ref &str) const {
+  const string_mref &append(const std::string_view &str) const {
     this->insert(this->end(), str.begin(), str.end());
     return *this;
   }
 
-  const string_mref &append(const boost::string_ref &str, size_t subpos,
+  const string_mref &append(const std::string_view &str, size_t subpos,
                             size_t sublen) const {
     this->insert(this->end(), &str[subpos], &str[subpos + sublen]);
     return *this;
@@ -331,7 +330,7 @@ public:
     return *this;
   }
 
-  const string_mref &operator+=(const boost::string_ref &str) const {
+  const string_mref &operator+=(const std::string_view &str) const {
     return this->append(str);
   }
   const string_mref &operator+=(char c) const { return this->append(1, c); }

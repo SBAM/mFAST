@@ -111,10 +111,10 @@ void hpp_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
   if (cpp_type.size()) {
 
     if (pIndex) {
-      header_cref_ << indent << "typedef " << cpp_type << "_cref " << name
-                   << "_cref;\n";
-      header_mref_ << indent << "typedef " << cpp_type << "_mref " << name
-                   << "_mref;\n";
+      header_cref_ << indent << "using " << name << "_cref = "
+                   << cpp_type << "_cref;\n";
+      header_mref_ << indent << "using " << name << "_mref = "
+                   << cpp_type << "_mref;\n";
       header_cref_ << indent << name << "_cref get_" << name << "() const;\n";
       header_cref_ << indent << name << "_cref try_get_" << name
                    << "() const;\n";
@@ -133,16 +133,17 @@ void hpp_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
     header_cref_
         << "\n" << indent << "class " << name << "_cref\n" << indent
         << "  : public mfast::aggregate_cref\n" << indent << "{\n" << indent
-        << "  typedef mfast::aggregate_cref base_type;\n" << indent
-        << "  public:\n" << indent << "    typedef mfast::group_instruction_ex<"
-        << name << "_cref> instruction_type;\n\n" << indent
-        << "    typedef const instruction_type* instruction_cptr;\n" << indent
+        << "    using base_type = mfast::aggregate_cref;\n" << indent
+        << "  public:\n" << indent
+        << "    using instruction_type = mfast::group_instruction_ex<" << name
+        << "_cref>;\n\n" << indent
+        << "    using instruction_cptr = const instruction_type*;\n" << indent
         << "    " << name << "_cref();\n" << indent
         << "    template <typename T>\n" << indent << "    " << name
         << "_cref(\n" << indent
-        << "      typename std::enable_if<std::is_same<typename T::cref_type, "
+        << "      typename std::enable_if_t<std::is_same_v<typename T::cref_type, "
         << name
-        << "_cref>::value, const mfast::value_storage*>::type storage,\n"
+        << "_cref>, const mfast::value_storage*> storage,\n"
         << indent << "      const T* instruction);\n\n" << indent
         << "    explicit " << name
         << "_cref(const mfast::field_cref& other);\n\n" << indent
@@ -156,13 +157,13 @@ void hpp_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
     header_mref_
         << "\n" << indent << "class " << name << "_mref\n" << indent
         << "  : public " << mref_base_type.str() << "\n" << indent << "{\n"
-        << indent << "  typedef " << mref_base_type.str() << " base_type;\n"
+        << indent << "    using base_type = " << mref_base_type.str() << ";\n"
         << indent << "  public:\n" << indent << "    " << name << "_mref();\n"
         << indent << "    template <typename T>\n" << indent << "    " << name
-        << "_mref(\n" << indent << "      mfast::allocator*       alloc,\n"
+        << "_mref(\n" << indent << "      mfast::allocator* alloc,\n"
         << indent
-        << "      typename std::enable_if<std::is_same<typename T::cref_type, "
-        << name << "_cref>::value, mfast::value_storage*>::type   storage,\n"
+        << "      typename std::enable_if_t<std::is_same_v<typename T::cref_type, "
+        << name << "_cref>, mfast::value_storage*> storage,\n"
         << indent << "      const T* instruction);\n\n" << indent
         << "    explicit " << name
         << "_mref(const mfast::field_mref_base& other);\n\n" << indent
@@ -200,14 +201,14 @@ void hpp_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
              << "  , public mfast::group_type\n"
              << "{\n"
              << "  private:\n"
-             << "    typedef  std::array<mfast::value_storage, "
-             << inst->subinstructions().size() << "> base_array;\n"
-             << "    typedef mfast::group_type base_type;\n"
+             << "    using base_array = std::array<mfast::value_storage, "
+             << inst->subinstructions().size() << ">;\n"
+             << "    using base_type = mfast::group_type;\n"
              << "  public:\n"
-             << "    typedef mfast::group_instruction_ex<" << name
-             << "_cref> instruction_type;\n\n"
-             << "    typedef " << name << "_cref cref_type;\n"
-             << "    typedef " << name << "_mref mref_type;\n"
+             << "    using instruction_type = mfast::group_instruction_ex<"
+             << name << "_cref>;\n\n"
+             << "    using cref_type = " << name << "_cref;\n"
+             << "    using mref_type = " << name << "_mref;\n"
              << "    " << name << "(\n"
              << "      mfast::allocator* "
                 "alloc=mfast::malloc_allocator::instance());\n"
@@ -273,10 +274,12 @@ void hpp_gen::gen_sequence_typedef(
       gen_sequence_typedef(nested_inst, element_type);
     }
   }
-  header_cref_ << indent << "typedef mfast::make_sequence_cref<" << element_type
-               << "_cref, " << trait << "> " << name << "_cref;\n";
-  header_mref_ << indent << "typedef mfast::make_sequence_mref<" << element_type
-               << "_mref, " << trait << "> " << name << "_mref;\n";
+  header_cref_ << indent << "using " << name << "_cref = "
+               << "mfast::make_sequence_cref<" << element_type << "_cref, "
+               << trait << ">;\n";
+  header_mref_ << indent << "using " << name << "_mref = "
+               << "mfast::make_sequence_mref<" << element_type << "_mref, "
+               << trait << ">;\n";
 }
 
 void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
@@ -291,15 +294,15 @@ void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
 
     if (inst->ref_instruction()->field_type() != mfast::field_type_template) {
 
-      header_cref_ << indent << "typedef " << cpp_type << "_cref " << name
-                   << "_cref;\n";
-      header_mref_ << indent << "typedef " << cpp_type << "_mref " << name
-                   << "_mref;\n";
+      header_cref_ << indent << "using " << name << "_cref = "
+                   << cpp_type << "_cref;\n";
+      header_mref_ << indent << "using " << name << "_mref = "
+                   << cpp_type << "_mref;\n";
     } else {
-      header_cref_ << indent << "typedef " << cpp_type << "_cref::" << name
-                   << "_cref " << name << "_cref;\n";
-      header_mref_ << indent << "typedef " << cpp_type << "_mref::" << name
-                   << "_mref " << name << "_mref;\n";
+      header_cref_ << indent << "using " << name << "_cref = "
+                   << cpp_type << "_cref::" << name << "_cref;\n";
+      header_mref_ << indent << "using " << name << "_mref = "
+                   << cpp_type << "_mref::" << name << "_mref;\n";
     }
 
   } else if (element_instruction == nullptr) {
@@ -308,11 +311,12 @@ void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
     header_cref_ << "\n" << indent << "class " << element_type << "_cref\n"
                  << indent << "  : public mfast::sequence_element_cref\n"
                  << indent << "{\n" << indent
-                 << "  typedef mfast::sequence_element_cref base_type;\n"
+                 << "  using base_type = mfast::sequence_element_cref;\n"
                  << indent << "  public:\n" << indent
-                 << "    typedef mfast::sequence_instruction_ex<"
-                 << element_type << "_cref> instruction_type;\n" << indent
-                 << "    typedef const instruction_type* instruction_cptr;\n"
+                 << "    using instruction_type = "
+                 << " mfast::sequence_instruction_ex<" << element_type
+                 << "_cref>;\n" << indent
+                 << "    using instruction_cptr = const instruction_type*;\n"
                  << indent << "    " << element_type << "_cref(\n" << indent
                  << "      const mfast::value_storage* storage,\n" << indent
                  << "      instruction_cptr            instruction);\n\n"
@@ -322,8 +326,9 @@ void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
     header_mref_ << "\n" << indent << "class " << element_type << "_mref\n"
                  << indent << "  : public mfast::make_aggregate_mref<"
                  << cref_scope_.str() << element_type << "_cref>\n" << indent
-                 << "{\n" << indent << "  typedef mfast::make_aggregate_mref<"
-                 << cref_scope_.str() << element_type << "_cref> base_type;\n"
+                 << "{\n" << indent << "  using base_type = "
+                 << "mfast::make_aggregate_mref<" << cref_scope_.str()
+                 << element_type << "_cref>;\n"
                  << indent << "  public:\n" << indent << "    " << element_type
                  << "_mref(\n" << indent
                  << "      mfast::allocator*     alloc,\n" << indent
@@ -337,10 +342,10 @@ void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
     header_cref_ << indent << "};\n\n";
     header_mref_ << indent << "};\n\n";
 
-    header_cref_ << indent << "typedef mfast::make_sequence_cref<"
-                 << element_type << "_cref> " << name << "_cref;\n";
-    header_mref_ << indent << "typedef mfast::make_sequence_mref<"
-                 << element_type << "_mref> " << name << "_mref;\n";
+    header_cref_ << indent << "using " << name << "_cref = "
+                 << "mfast::make_sequence_cref<" << element_type << "_cref>;\n";
+    header_mref_ << indent << "using " << name << "_mref = "
+                 << "mfast::make_sequence_mref<" << element_type << "_mref>;\n";
 
   } else {
     gen_sequence_typedef(inst, name);
@@ -366,12 +371,12 @@ void hpp_gen::visit(const mfast::sequence_field_instruction *inst,
     content_ << export_symbol_uppercase_ << name << "\n"
              << "  : public mfast::sequence_type\n"
              << "{\n"
-             << "  typedef mfast::sequence_type base_type;\n"
+             << "  using base_type = mfast::sequence_type;\n"
              << "  public:\n"
-             << "    typedef " << name
-             << "_cref::instruction_type instruction_type;\n\n"
-             << "    typedef " << name << "_cref cref_type;\n"
-             << "    typedef " << name << "_mref mref_type;\n"
+             << "    using instruction_type = " << name
+             << "_cref::instruction_type;\n\n"
+             << "    using cref_type = " << name << "_cref;\n"
+             << "    using mref_type = " << name << "_mref ;\n"
              << "    " << name << "(\n"
              << "      mfast::allocator* "
                 "alloc=mfast::malloc_allocator::instance());\n"
@@ -411,16 +416,16 @@ void hpp_gen::visit(const mfast::template_instruction *inst, void *) {
   header_cref_
       << "\n" << indent << "class " << name << "_cref\n" << indent
       << "  : public mfast::aggregate_cref\n" << indent << "{\n" << indent
-      << "  typedef mfast::aggregate_cref base_type;\n" << indent
+      << "  using base_type = mfast::aggregate_cref;\n" << indent
       << "  public:\n" << indent
-      << "    typedef mfast::template_instruction_ex<" << name
-      << "_cref> instruction_type;\n" << indent
-      << "    typedef const instruction_type* instruction_cptr;\n" << indent
-      << "    " << name << "_cref();\n" << indent
+      << "    using instruction_type = mfast::template_instruction_ex<" << name
+      << "_cref>;\n" << indent
+      << "    using instruction_cptr = const instruction_type*;\n"
+      << indent << "    " << name << "_cref();\n" << indent
       << "    template <typename T>\n" << indent << "    " << name << "_cref(\n"
       << indent
-      << "      typename std::enable_if<std::is_same<typename T::cref_type, "
-      << name << "_cref>::value, const mfast::value_storage*>::type storage,\n"
+      << "      typename std::enable_if_t<std::is_same_v<typename T::cref_type, "
+      << name << "_cref>, const mfast::value_storage*> storage,\n"
       << indent << "      const T* instruction);\n\n" << indent << "    "
       << name << "_cref(const mfast::message_cref& other);\n\n" << indent
       << "    explicit " << name << "_cref(const mfast::field_cref& other);\n\n"
@@ -429,19 +434,20 @@ void hpp_gen::visit(const mfast::template_instruction *inst, void *) {
       << "    void accept(Visitor& v);\n\n";
 
   header_mref_
-      << "\n" << indent << "typedef mfast::make_aggregate_mref<" << name
-      << "_cref> " << name << "_mref_base;\n" << indent << "class " << name
-      << "_mref\n" << indent << "  : public " << name << "_mref_base\n"
-      << indent << "{\n" << indent << "  typedef " << name
-      << "_mref_base base_type;\n" << indent << "  public:\n" << indent
-      << "    typedef mfast::template_instruction_ex<" << name
-      << "_cref> instruction_type;\n" << indent
-      << "    typedef const instruction_type* instruction_cptr;\n" << indent
+      << "\n" << indent << "using " << name << "_mref_base = "
+      << "mfast::make_aggregate_mref<" << name << "_cref>;\n" << indent
+      << "class " << name << "_mref\n" << indent
+      << "  : public " << name << "_mref_base\n" << indent << "{\n" << indent
+      << "  using base_type = " << name << "_mref_base;\n" << indent
+      << "  public:\n" << indent
+      << "    using instruction_type = mfast::template_instruction_ex<" << name
+      << "_cref>;\n" << indent
+      << "    using instruction_cptr = const instruction_type*;\n" << indent
       << "    " << name << "_mref();\n" << indent
       << "    template <typename T>\n" << indent << "    " << name << "_mref(\n"
       << indent << "      mfast::allocator*       alloc,\n" << indent
-      << "      typename std::enable_if<std::is_same<typename T::cref_type, "
-      << name << "_cref>::value, mfast::value_storage*>::type   storage,\n"
+      << "      typename std::enable_if_t<std::is_same_v<typename T::cref_type, "
+      << name << "_cref>, mfast::value_storage*> storage,\n"
       << indent << "      const T* instruction);\n\n" << indent << "    "
       << name << "_mref(const mfast::message_mref& other);\n\n" << indent
       << "    operator mfast::message_mref();\n" << indent << "    explicit "
@@ -469,22 +475,24 @@ void hpp_gen::visit(const mfast::template_instruction *inst, void *) {
       << inst->subinstructions().size() << ">\n"
       << "  , public mfast::message_type\n"
       << "{\n"
-      << "  typedef mfast::message_type base_type;\n"
+      << "  using base_type = mfast::message_type;\n"
       << "  public:\n"
       << "    enum {\n"
       << "      the_id = " << inst->id() << "\n"
       << "    };\n"
-      << "    typedef mfast::template_instruction_ex<" << name
-      << "_cref> instruction_type;\n\n"
-      << "    typedef mfast::make_message_cref<" << name
-      << "_cref, instruction_type> cref_type;\n"
-      << "    typedef mfast::make_message_mref<" << name
-      << "_mref, instruction_type> mref_type;\n"
+      << "    using instruction_type = mfast::template_instruction_ex<" << name
+      << "_cref>;\n\n"
+      << "    using cref_type = mfast::make_message_cref<" << name
+      << "_cref, instruction_type>;\n"
+      << "    using mref_type = mfast::make_message_mref<" << name
+      << "_mref, instruction_type>;\n"
       << "    " << name << "(\n"
       << "      mfast::allocator* alloc=mfast::malloc_allocator::instance());\n"
       << "    " << name << "(\n"
       << "      const " << name << "_cref& other,\n"
       << "      mfast::allocator* alloc=mfast::malloc_allocator::instance());\n"
+      << "    " << name << "(const " << name << "&) = delete;\n"
+      << "    " << name << "& operator=(const " << name << "&) = delete;\n"
       << "#ifdef MFAST_JSON_H\n"
       << "    explicit " << name << "(\n"
       << "      const char* json_initializer,\n"
@@ -496,9 +504,6 @@ void hpp_gen::visit(const mfast::template_instruction *inst, void *) {
       << "    mref_type ref();\n"
       << "    mref_type mref();\n"
       << "    static const instruction_type* instruction();\n"
-      << "  private:\n"
-      << "    " << name << "(const " << name << "&);\n"
-      << "    " << name << "& operator = (const " << name << "&);\n"
       << "};\n\n";
 }
 
@@ -546,7 +551,7 @@ void hpp_gen::generate(mfast::dynamic_templates_description &desc) {
     out_ << "struct " << export_symbol_uppercase_ << " templates_description\n"
          << "  : mfast::templates_description\n"
          << "{\n"
-         << "  typedef std::tuple<";
+         << "  using types = std::tuple<";
 
     bool first = true;
     for (std::size_t i = 0; i < desc.size(); ++i) {
@@ -560,7 +565,7 @@ void hpp_gen::generate(mfast::dynamic_templates_description &desc) {
       }
     }
 
-    out_ << "> types;\n"
+    out_ << ">;\n"
          << "  templates_description();\n"
          << "  static const templates_description* instance();\n"
          << "};\n\n";
@@ -582,10 +587,10 @@ void hpp_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex) {
 
   if (inst->ref_instruction()) {
     std::string actual_type_name = cpp_type_of(inst, &dependency_);
-    header_cref_ << indent << "typedef " << actual_type_name << "_cref " << name
-                 << "_cref;\n";
-    header_mref_ << indent << "typedef " << actual_type_name << "_mref " << name
-                 << "_mref;\n";
+    header_cref_ << indent << "using " << name << "_cref = "
+                 << actual_type_name << "_cref;\n";
+    header_mref_ << indent << "using " << name << "_mref = "
+                 << actual_type_name << "_mref;\n";
   } else {
     // this is the enum definition
     header_cref_ << indent << "struct ";
@@ -603,19 +608,20 @@ void hpp_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex) {
     }
 
     header_cref_ << "\n" << indent << "  };\n" << indent
-                 << "  typedef mfast::enum_field_instruction_ex<" << name
-                 << "> instruction_type;\n" << indent
+                 << "  using instruction_type = "
+                 << "mfast::enum_field_instruction_ex<"
+                 << name << ">;\n" << indent
                  << "  static const instruction_type* instruction();\n"
                  << indent << "};\n\n";
 
     header_cref_ << indent << "class " << name << "_cref\n" << indent
                  << "  : public mfast::enum_cref_ex<" << name << "_cref, "
                  << name << ">\n" << indent << "{\n" << indent << "  public:\n"
-                 << indent << "    typedef mfast::enum_cref_ex<" << name
-                 << "_cref, " << name << "> base_type;\n" << indent
-                 << "    typedef " << name << "::element element_type;\n"
-                 << indent << "    typedef " << name
-                 << "::instruction_type instruction_type;\n" << indent << "    "
+                 << indent << "    using base_type = mfast::enum_cref_ex<"
+                 << name << "_cref, " << name << ">;\n" << indent
+                 << "    using element_type = " << name << "::element;\n"
+                 << indent << "    using instruction_type = " << name
+                 << "::instruction_type;\n" << indent << "    "
                  << name << "_cref(\n" << indent
                  << "      const mfast::value_storage* storage=nullptr,\n" << indent
                  << "      instruction_cptr            instruction=nullptr);\n\n"
@@ -634,10 +640,10 @@ void hpp_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex) {
                  << "  : public mfast::enum_mref_ex<" << name << "_mref, "
                  << name << "_cref>\n" << indent << "{\n" << indent
                  << "  public:\n" << indent
-                 << "    typedef  mfast::enum_mref_ex<" << name << "_mref, "
-                 << name << "_cref> base_type;\n" << indent << "    typedef "
-                 << name << "::element element_type;\n" << indent << "    "
-                 << name << "_mref(\n" << indent
+                 << "    using base_type = mfast::enum_mref_ex<" << name
+                 << "_mref, " << name << "_cref>;\n" << indent
+                 << "    using element_type = " << name << "::element;\n"
+                 << indent << "    " << name << "_mref(\n" << indent
                  << "      mfast::allocator*     alloc=nullptr,\n" << indent
                  << "      mfast::value_storage* storage=nullptr,\n" << indent
                  << "      instruction_cptr      instruction=nullptr);\n"
@@ -684,8 +690,8 @@ void hpp_gen::generate(const mfast::aggregate_view_info &info) {
   out_ << "  class " << export_symbol_uppercase_ << my_name << "\n"
        << "  {\n"
        << "  public:\n"
-       << "    typedef mfast::view_iterator iterator;\n"
-       << "    typedef mfast::view_iterator const_iterator;\n"
+       << "    using iterator = mfast::view_iterator;\n"
+       << "    using const_iterator = mfast::view_iterator;\n"
        << "    " << my_name << "(const " << ns_prefix
        << cpp_name(info.instruction_->name()) << "_cref& ref);\n\n"
        << "    iterator begin() const;\n"

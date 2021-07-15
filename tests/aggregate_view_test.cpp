@@ -24,8 +24,9 @@
 #include <mfast/xml_parser/dynamic_templates_description.h>
 #include "test5.h"
 
-
 #include "debug_allocator.h"
+
+using namespace std::string_view_literals;
 
 const char* xml_content= R"(
 <?xml version="1.0"?>
@@ -122,7 +123,7 @@ TEST_CASE("test view parsing capabilities", "[parse_view_test]")
     REQUIRE(description.view_infos().size() == 1U);
 
     const mfast::aggregate_view_info& info = description.view_infos()[0];
-    REQUIRE( boost::string_ref(info.name_) == boost::string_ref("PersonView") );
+    REQUIRE( std::string_view(info.name_) == "PersonView"sv );
     REQUIRE( info.data_.size() == 8U);
 
     REQUIRE( info.data_[0].cont() == false);

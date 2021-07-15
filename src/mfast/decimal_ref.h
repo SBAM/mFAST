@@ -7,7 +7,7 @@
 
 #include <cmath>
 #include <cfloat>
-#include <boost/utility/string_ref.hpp>
+#include <string_view>
 #include "mfast_export.h"
 #include "field_ref.h"
 #include "int_ref.h"
@@ -374,7 +374,7 @@ private:
     this->storage()->present(1);
   }
 
-  void as_i(boost::string_ref decimal_str) const {
+  void as_i(std::string_view decimal_str) const {
     typedef boost::iostreams::stream<boost::iostreams::array_source>
         array_stream;
     array_stream is(decimal_str.data(), decimal_str.size());

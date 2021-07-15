@@ -23,6 +23,7 @@
 #include <sstream>
 #include "debug_allocator.h"
 
+using namespace std::string_view_literals;
 
 namespace mfast {
 namespace json {
@@ -196,7 +197,7 @@ TEST_CASE("test json_decode with a value null","[json_decode_null_test]")
     std::stringstream strm(result);
 
     mfast::json::decode(strm, account_holder.mref());
-    REQUIRE(account_holder.cref().get_userName().value() ==  boost::string_ref("test"));
+    REQUIRE(account_holder.cref().get_userName().value() == "test"sv);
     REQUIRE( account_holder.cref().get_password().absent() );
   }
   catch (boost::exception& ex)
