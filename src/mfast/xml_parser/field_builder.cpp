@@ -524,9 +524,17 @@ bool parse_enum_value(const char **enum_element_names,
                       const uint64_t *enum_element_values,
                       uint64_t num_elements, const char *value_name,
                       uint64_t &result) {
-
+  std::optional<std::uint64_t> value_int;
+  try
+  {
+    value_int = std::stoul(value_name);
+  }
+  catch (...) {}
   for (uint64_t i = 0; i < num_elements; ++i) {
-    if (std::strcmp(enum_element_names[i], value_name) == 0) {
+    // FAST 1.2 does not cleary specify what a default enum value refers to
+    // search for a match in either name or value/deduce_value
+    if (std::strcmp(enum_element_names[i], value_name) == 0 ||
+        (value_int.has_value() && enum_element_values[i] == *value_int)) {
       if (enum_element_values)
         result = enum_element_values[i];
       else
@@ -574,7 +582,11 @@ void field_builder::visit(const enum_field_instruction *inst, void *) {
         content_element_->FirstChildElement("element");
     for (; xml_element != nullptr;
          xml_element = xml_element->NextSiblingElement("element")) {
-      const char *name_attr = xml_element->Attribute("name");
+      // Use fancier identifier if available (Eurex style)
+      const char *name_attr = xml_element->Attribute("id");
+      // Otherwise revert to the specified name attribute
+      if (name_attr == nullptr)
+        name_attr = xml_element->Attribute("name");
       if (name_attr != nullptr) {
         if (init_value_str && std::strcmp(name_attr, init_value_str) == 0) {
           fop.initial_value_.set<uint64_t>(names.size());
@@ -588,13 +600,18 @@ void field_builder::visit(const enum_field_instruction *inst, void *) {
             values.push_back(v);
           }
         }
-      } else {
-        throw std::runtime_error("XML element must have a name attribute");
+        else {
+          // FAST 1.2 specification does not require a value attribute
+          if (values.empty())
+            values.push_back(0);
+          else
+            values.push_back(values.back() + 1);
+        }
       }
     }
 
-    if (values.size() && values.size() != names.size()) {
-      throw std::runtime_error("Invalid value specification for enum elements");
+    if (values.size() != names.size()) {
+      throw std::runtime_error("enum definition internal error");
     }
 
     num_elements = names.size();

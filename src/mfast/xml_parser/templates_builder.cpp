@@ -67,6 +67,11 @@ templates_builder::templates_builder(dynamic_templates_description *definition,
       string_value_storage());
   this->member["string"] = &ascii_field_instruction_prototype;
 
+  static const int64_field_instruction timestamp_field_instruction_prototype(
+      operator_none, presence_mandatory, 0, nullptr, "", nullptr,
+      int_value_storage<int64_t>());
+  this->member["timestamp"] = &timestamp_field_instruction_prototype;
+
   static const byte_vector_field_instruction
       byte_vector_field_instruction_prototype(
           operator_none, presence_mandatory, 0, nullptr, "", nullptr,

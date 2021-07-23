@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates
+    xmlns="http://www.fixprotocol.org/ns/fast/td/1.2"
+    xmlns:scp="http://www.fixprotocol.org/ns/fast/scp/1.2"
+    templateNs="https://www.deutsche-boerse.com/rta">
+
+  <define name="TypeMDStatisticStatus">
+    <enum>
+      <element name="1" id="Active"/>
+      <element name="2" id="Inactive"/>
+    </enum>
+  </define>
+
+  <define name="TypeUnit">
+    <enum>
+      <element name="0" id="Seconds"/>
+      <element name="3" id="MilliSeconds"/>
+      <element name="10" id="Minutes"/>
+      <element name="12" id="Days"/>
+    </enum>
+  </define>
+
+  <template name="MarketDataStatisticsReferenceData" id="200">
+    <string name="MsgType" id="35">
+      <constant value="DP"/>
+    </string>
+    <field name="MDStatisticStatus" id="2477">
+      <type name="TypeMDStatisticStatus">
+        <default value="0"/>
+      </type>
+    </field>
+    <field name="MDStatisticFrequencyUnit" id="2461" presence="optional">
+      <type name="TypeUnit"/>
+    </field>
+    <field name="MDStatisticIntervalUnit" id="2467">
+      <type name="TypeUnit">
+        <default value="3"/>
+      </type>
+    </field>
+  </template>
+
+  <template name="MarketDataReport" id="152">
+    <string name="MsgType" id="35">
+      <constant value="U20"/>
+    </string>
+    <timestamp name="TransactTime" unit="nanosecond" id="60">
+      <delta/>
+    </timestamp>
+  </template>
+
+</templates>

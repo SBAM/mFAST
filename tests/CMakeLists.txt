@@ -24,6 +24,7 @@ FASTTYPEGEN_TARGET(test_types1 test1.xml test2.xml)
 FASTTYPEGEN_TARGET(test_types3 test3.xml)
 FASTTYPEGEN_TARGET(test_types4 test4.xml)
 FASTTYPEGEN_TARGET(test_types5 test5.xml)
+FASTTYPEGEN_TARGET(test_types6 test6.xml)
 FASTTYPEGEN_TARGET(test_scp scp.xml)
 
 add_executable (mfast_test
@@ -41,6 +42,7 @@ add_executable (mfast_test
                 ${FASTTYPEGEN_test_types3_OUTPUTS}
                 ${FASTTYPEGEN_test_types4_OUTPUTS}
                 ${FASTTYPEGEN_test_types5_OUTPUTS}
+                ${FASTTYPEGEN_test_types6_OUTPUTS}
                 ${FASTTYPEGEN_test_scp_OUTPUTS}
                 ${FASTTYPEGEN_simple_types1_OUTPUTS}
                 ${FASTTYPEGEN_simple_types2_OUTPUTS}
@@ -59,6 +61,7 @@ add_executable (mfast_test
                 aggregate_view_test.cpp
                 simple_coder_test.cpp
                 scp_reset_test.cpp
+                test_eurex_fast_1_2.cpp
             )
 
 target_link_libraries (mfast_test
