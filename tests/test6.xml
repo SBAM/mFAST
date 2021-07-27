@@ -20,6 +20,24 @@
     </enum>
   </define>
 
+  <define name="TradeConditionSet">
+    <set>
+      <element name="U" id="ExchangeLast"/>
+      <element name="R" id="OpeningPrice"/>
+      <element name="AX" id="HighPrice"/>
+      <element name="AY" id="LowPrice"/>
+      <element name="AJ" id="OfficialClosingPrice"/>
+      <element name="AW" id="LastAuctionPrice"/>
+      <element name="k" id="OutOfSequenceETH"/>
+      <element name="BD" id="PreviousClosingPrice"/>
+      <element name="a" id="VolumeOnly"/>
+      <element name="BB" id="MidpointPrice"/>
+      <element name="BC" id="TradingOnTermsOfIssue"/>
+      <element name="SA" id="SpecialAuction"/>
+      <element name="TC" id="TradeAtClose"/>
+    </set>
+  </define>
+
   <template name="MarketDataStatisticsReferenceData" id="200">
     <string name="MsgType" id="35">
       <constant value="DP"/>
@@ -46,6 +64,17 @@
     <timestamp name="TransactTime" unit="nanosecond" id="60">
       <delta/>
     </timestamp>
+  </template>
+
+  <template id="94" name="DepthIncremental">
+    <string name="MsgType" id="35">
+      <constant value="X"/>
+    </string>
+    <field name="TradeCondition" id="277" presence="optional">
+      <type name="TradeConditionSet">
+        <default value="1"/>
+      </type>
+    </field>
   </template>
 
 </templates>

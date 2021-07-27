@@ -63,3 +63,27 @@ TEST_CASE("eurex timestamps","[test_eurex_timestamps]")
   md_mref.set_TransactTime().as(123456789);
   REQUIRE(md_mref.set_TransactTime().value() == 123456789);
 }
+
+
+TEST_CASE("eurex sets","[test_eurex_sets]")
+{
+  debug_allocator alloc;
+  using namespace test6;
+
+  DepthIncremental md(&alloc);
+  DepthIncremental_mref md_mref(md.mref());
+  REQUIRE(md_mref.get_TradeCondition().has_ExchangeLast());
+  md_mref.omit_TradeCondition();
+  REQUIRE_THROWS_AS(md_mref.try_get_TradeCondition(), const mfast::bad_optional_access&);
+  md_mref.set_TradeCondition().set_LowPrice();
+  REQUIRE(md_mref.get_TradeCondition().has_LowPrice());
+  md_mref.set_TradeCondition().set_TradeAtClose();
+  REQUIRE(md_mref.get_TradeCondition().has_LowPrice());
+  REQUIRE(md_mref.get_TradeCondition().has_TradeAtClose());
+  md_mref.set_TradeCondition().unset_LowPrice();
+  REQUIRE(!md_mref.get_TradeCondition().has_LowPrice());
+  REQUIRE(md_mref.get_TradeCondition().has_TradeAtClose());
+  md_mref.set_TradeCondition().unset_TradeAtClose();
+  REQUIRE(!md_mref.get_TradeCondition().has_LowPrice());
+  REQUIRE(!md_mref.get_TradeCondition().has_TradeAtClose());
+}

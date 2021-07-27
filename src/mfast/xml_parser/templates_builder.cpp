@@ -36,7 +36,10 @@ templates_builder::templates_builder(dynamic_templates_description *definition,
           &length_instruction_prototype, "", "", cpp_ns_),
       enum_field_instruction_prototype_(operator_none, presence_mandatory, 0,
                                         nullptr, "", nullptr, 0, nullptr,
-                                        nullptr, 0, nullptr, cpp_ns_) {
+                                        nullptr, 0, nullptr, cpp_ns_),
+      set_field_instruction_prototype_(operator_none, presence_mandatory, 0,
+                                       nullptr, "", nullptr, 0, nullptr,
+                                       0, nullptr, cpp_ns_) {
   static const int32_field_instruction int32_field_instruction_prototype(
       operator_none, presence_mandatory, 0, nullptr, "", nullptr,
       int_value_storage<int32_t>());
@@ -103,6 +106,7 @@ templates_builder::templates_builder(dynamic_templates_description *definition,
   this->member["template"] = &template_instruction_prototype_;
   this->member["boolean"] = mfast::boolean::instruction();
   this->member["enum"] = &enum_field_instruction_prototype_;
+  this->member["set"] = &set_field_instruction_prototype_;
 }
 
 bool templates_builder::VisitEnter(const XMLElement &element,

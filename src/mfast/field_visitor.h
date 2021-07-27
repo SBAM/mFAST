@@ -13,6 +13,7 @@
 #include "sequence_ref.h"
 #include "message_ref.h"
 #include "nested_message_ref.h"
+#include "set_ref.h"
 namespace mfast {
 namespace detail {
 template <typename Result> struct result_holder {
@@ -152,6 +153,12 @@ public:
     this->apply_visitor(accssor_, ref);
   }
 
+  virtual void visit(const set_field_instruction *inst,
+                     void *storage) override {
+    set_cref ref(static_cast<value_storage *>(storage), inst);
+    this->apply_visitor(accssor_, ref);
+  }
+
   using result_holder<Result>::get_result;
 };
 
@@ -267,6 +274,12 @@ public:
   virtual void visit(const enum_field_instruction *inst,
                      void *storage) override {
     enum_mref ref(alloc_, static_cast<value_storage *>(storage), inst);
+    this->apply_visitor(mutator_, ref);
+  }
+
+  virtual void visit(const set_field_instruction *inst,
+                     void *storage) override {
+    set_mref ref(alloc_, static_cast<value_storage *>(storage), inst);
     this->apply_visitor(mutator_, ref);
   }
 

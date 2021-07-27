@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mfast.h>
+#include <bitset>
 #include <iostream>
 #include <boost/io/ios_state.hpp>
 
@@ -130,5 +131,11 @@ class message_printer
       }
       --indent_;
     }
+
+    void visit(const set_cref& ref)
+    {
+      os_ << "0b" << std::bitset<16>{ref.value()};
+    }
+
 };
 
