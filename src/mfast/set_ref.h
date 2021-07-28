@@ -26,19 +26,19 @@ namespace mfast
     using type_category = integer_type_tag;
 
     set_cref() = default;
-    set_cref(const value_storage *storage, instruction_cptr instruction)
-      : field_cref(storage, instruction) {}
-
+    set_cref(const value_storage *storage, instruction_cptr instruction) :
+      field_cref(storage, instruction) {}
     set_cref(const set_cref &other) = default;
-    explicit set_cref(const field_cref &other) : field_cref(other) {}
     set_cref& operator=(const set_cref&) = delete;
+    explicit set_cref(const field_cref &other) : field_cref(other) {}
 
     uint32_t id() const { return instruction_->id(); }
     bool is_initial_value() const
     {
-      return (this->absent() == this->instruction()->initial_value().is_empty() &&
-              (this->absent() ||
-               value() == this->instruction()->initial_value().get<uint64_t>()));
+      const auto init_val = this->instruction()->initial_value();
+      return
+        this->absent() == init_val.is_empty() &&
+        (this->absent() || value() == init_val.get<uint64_t>());
     }
 
     value_type value() const { return storage_->get<value_type>(); }
@@ -46,6 +46,15 @@ namespace mfast
     instruction_cptr instruction() const
     {
       return static_cast<instruction_cptr>(instruction_);
+    }
+
+  protected:
+    friend class mfast::detail::codec_helper;
+    void save_to(value_storage &v) const
+    {
+      v.of_uint64.content_ = this->storage()->of_uint64.content_;
+      v.defined(true);
+      v.present(this->present());
     }
   };
 
@@ -73,6 +82,8 @@ namespace mfast
              instruction_cptr instruction) :
       base_type(alloc, storage, instruction) {}
     set_mref(const set_mref&) = default;
+    set_mref& operator=(const set_mref&) = delete;
+    explicit set_mref(const field_mref_base &other) : base_type(other) {}
 
     void as(const set_cref &cref) const
     {
@@ -93,6 +104,10 @@ namespace mfast
       *this->storage() = this->instruction()->initial_value();
     }
     value_type value() const { return this->storage()->get<value_type>(); }
+
+  protected:
+    friend class mfast::detail::codec_helper;
+    void copy_from(value_storage v) const { *this->storage() = v; }
   };
 
   template <> struct mref_of<set_cref> { using type = set_mref; };
@@ -123,8 +138,8 @@ namespace mfast
     using intruction_cptr = const instruction_type*;
 
     set_cref_ex(const value_storage *storage,
-                const set_field_instruction *instruction)
-      : set_cref(storage, instruction) {}
+                const set_field_instruction *instruction) :
+      set_cref(storage, instruction) {}
 
     set_cref_ex(const field_cref &other) : set_cref(other) {}
     bool operator==(const Derived &v) const { return this->value() == v.value(); }

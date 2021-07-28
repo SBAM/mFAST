@@ -26,7 +26,9 @@ public:
       : field_cref(storage, instruction) {}
 
   int_cref(const int_cref &other) : field_cref(other) {}
+  int_cref& operator=(const int_cref&) = delete;
   explicit int_cref(const field_cref &other) : field_cref(other) {}
+
   uint32_t id() const { return instruction_->id(); }
   bool is_initial_value() const {
     return (
@@ -42,8 +44,6 @@ public:
 
 protected:
   friend class mfast::detail::codec_helper;
-
-  int_cref &operator=(const int_cref &);
 
   void save_to(value_storage &v) const {
     v.of_uint64.content_ = this->storage()->of_uint64.content_;
@@ -83,8 +83,9 @@ public:
       : base_type(alloc, storage, instruction) {}
 
   int_mref(const int_mref &) = default;
-
+  int_mref& operator=(const int_mref&) = delete;
   explicit int_mref(const field_mref_base &other) : base_type(other) {}
+
   void as(const int_cref<T> &cref) const {
     if (cref.absent()) {
       this->omit();
@@ -114,7 +115,6 @@ protected:
   template <typename U>
   friend fast_istream &operator>>(fast_istream &strm, const int_mref<U> &mref);
 
-  int_mref &operator=(const int_mref &);
 
   friend class mfast::detail::codec_helper;
 

@@ -26,7 +26,9 @@ public:
       : field_cref(storage, instruction) {}
 
   enum_cref(const enum_cref &other) : field_cref(other) {}
+  enum_cref& operator=(const enum_cref&) = delete;
   explicit enum_cref(const field_cref &other) : field_cref(other) {}
+
   uint32_t id() const { return instruction_->id(); }
   bool is_initial_value() const {
     return (this->absent() == this->instruction()->initial_value().is_empty() &&
@@ -45,8 +47,14 @@ public:
   }
   bool is_boolean() const;
 
-private:
-  enum_cref &operator=(const enum_cref &);
+protected:
+  friend class mfast::detail::codec_helper;
+
+  void save_to(value_storage &v) const {
+    v.of_uint64.content_ = this->storage()->of_uint64.content_;
+    v.defined(true);
+    v.present(this->present());
+  }
 };
 
 inline bool operator==(const enum_cref &lhs, const enum_cref &rhs) {
@@ -69,6 +77,8 @@ public:
       : base_type(alloc, storage, instruction) {}
 
   enum_mref(const enum_mref &) = default;
+  enum_mref& operator=(const enum_mref&) = delete;
+  explicit enum_mref(const field_mref_base &other) : base_type(other) {}
 
   void as(const enum_cref &cref) const {
     if (cref.absent()) {
@@ -87,6 +97,10 @@ public:
     *this->storage() = this->instruction()->initial_value();
   }
   value_type value() const { return this->storage()->get<value_type>(); }
+
+protected:
+  friend class mfast::detail::codec_helper;
+  void copy_from(value_storage v) const { *this->storage() = v; }
 };
 
 template <> struct mref_of<enum_cref> { typedef enum_mref type; };

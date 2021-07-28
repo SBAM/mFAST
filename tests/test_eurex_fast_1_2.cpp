@@ -50,6 +50,8 @@ TEST_CASE("eurex enums","[test_eurex_enums]")
   REQUIRE(md_mref.get_MDStatisticIntervalUnit().is_Days());
   md_mref.set_MDStatisticIntervalUnit().as_MilliSeconds();
   REQUIRE(md_mref.get_MDStatisticIntervalUnit().is_MilliSeconds());
+
+  REQUIRE(md_mref.get_TypeUnit().is_Minutes());
 }
 
 
@@ -86,4 +88,5 @@ TEST_CASE("eurex sets","[test_eurex_sets]")
   md_mref.set_TradeCondition().unset_TradeAtClose();
   REQUIRE(!md_mref.get_TradeCondition().has_LowPrice());
   REQUIRE(!md_mref.get_TradeCondition().has_TradeAtClose());
+  REQUIRE(md_mref.get_TradeConditionSet().has_VolumeOnly());
 }

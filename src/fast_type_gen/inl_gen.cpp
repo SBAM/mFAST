@@ -18,7 +18,7 @@ const char *get_operator_tag(const mfast::field_instruction *inst) {
 template <typename Instruction>
 std::string get_properties_type(const Instruction *inst) {
   std::stringstream strm;
-  strm << "properties_type< " << inst->properties() << "> ";
+  strm << "properties_type<" << inst->properties() << ">";
   return strm.str();
 }
 
@@ -57,7 +57,7 @@ public:
       out_ << "std::tuple<" << get_operator_tag(inst) << ", "
            << get_operator_tag(inst->mantissa_instruction()) << ">, "
            << "std::tuple<" << get_properties_type(inst) << ", "
-           << get_properties_type(inst->mantissa_instruction()) << "> >";
+           << get_properties_type(inst->mantissa_instruction()) << ">>";
     } else {
       out_ << get_operator_tag(inst) << ", " << get_properties_type(inst)
            << ">";
@@ -958,7 +958,8 @@ void inl_gen::generate(mfast::dynamic_templates_description &desc) {
   }
 }
 
-void inl_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex) {
+void inl_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex)
+{
   std::string name(cpp_name(inst));
   std::string cref_type_name = cref_scope_.str() + name + "_cref";
   std::string mref_type_name = mref_scope_.str() + name + "_mref";
@@ -1014,8 +1015,10 @@ void inl_gen::visit(const mfast::enum_field_instruction *inst, void *pIndex) {
            << "}\n\n";
     }
   }
-
-  gen_accessors(inst, name, cref_type_name, mref_type_name, pIndex);
+  std::string ret_type = cpp_type_of(inst, nullptr);
+  auto ret_cref = ret_type + "_cref";
+  auto ret_mref = ret_type + "_mref";
+  gen_accessors(inst, name, ret_cref, ret_mref, pIndex);
 }
 
 void inl_gen::visit(const mfast::set_field_instruction *inst, void *pIndex)
@@ -1082,8 +1085,10 @@ void inl_gen::visit(const mfast::set_field_instruction *inst, void *pIndex)
            << "}\n\n";
     }
   }
-
-  gen_accessors(inst, name, cref_type_name, mref_type_name, pIndex);
+  std::string ret_type = cpp_type_of(inst, nullptr);
+  auto ret_cref = ret_type + "_cref";
+  auto ret_mref = ret_type + "_mref";
+  gen_accessors(inst, name, ret_cref, ret_mref, pIndex);
 }
 
 void inl_gen::gen_accessors(const mfast::field_instruction *inst,
@@ -1092,15 +1097,17 @@ void inl_gen::gen_accessors(const mfast::field_instruction *inst,
                             const std::string &mref_type_name, void *pIndex) {
   if (pIndex) {
     std::size_t index = *static_cast<std::size_t *>(pIndex);
-    out_ << "inline " << cref_type_name << "\n" << cref_scope_.str() << "get_"
-         << name << "() const\n"
+    out_ << "inline auto\n"
+         << cref_scope_.str() << "get_" << name << "() const\n"
+         << "  -> " << cref_type_name << "\n"
          << "{\n"
          << "  return static_cast<" << cref_type_name << ">((*this)[" << index
          << "]);\n"
          << "}\n\n";
 
-    out_ << "inline " << cref_type_name << "\n" << cref_scope_.str()
-         << "try_get_" << name << "() const\n"
+    out_ << "inline auto\n"
+         << cref_scope_.str() << "try_get_" << name << "() const\n"
+         << "  -> " << cref_type_name << "\n"
          << "{\n";
 
     if (inst->optional())
@@ -1113,8 +1120,9 @@ void inl_gen::gen_accessors(const mfast::field_instruction *inst,
          << "}\n\n";
 
     if (!is_const_field(inst)) {
-      out_ << "inline " << mref_type_name << "\n" << mref_scope_.str() << "set_"
-           << name << "() const\n"
+      out_ << "inline auto\n"
+           << mref_scope_.str() << "set_" << name << "() const\n"
+           << "  -> " << mref_type_name << "\n"
            << "{\n"
            << "  return static_cast<" << mref_type_name << ">((*this)[" << index
            << "]);\n"

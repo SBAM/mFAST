@@ -55,6 +55,12 @@
         <default value="3"/>
       </type>
     </field>
+    <!-- naming clash test -->
+    <field name="TypeUnit" id="2468">
+      <type name="TypeUnit">
+        <default value="2"/>
+      </type>
+    </field>
   </template>
 
   <template name="MarketDataReport" id="152">
@@ -73,6 +79,12 @@
     <field name="TradeCondition" id="277" presence="optional">
       <type name="TradeConditionSet">
         <default value="1"/>
+      </type>
+    </field>
+    <!-- naming clash test -->
+    <field name="TradeConditionSet" id="278" presence="optional">
+      <type name="TradeConditionSet">
+        <default value="9"/>
       </type>
     </field>
   </template>
