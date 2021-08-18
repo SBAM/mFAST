@@ -89,4 +89,708 @@
     </field>
   </template>
 
+  <!--
+      Eurex RDI FAST 1.2 minimalist InstrumentSnapshot and
+      dependencies, version below is T7 v9.1 available at
+      https://www.eurex.com/ex-en/support/initiatives/t7-release-9-1
+  -->
+  <define name="SecurityType">
+    <enum>
+      <element name="OPT" id="Option"/>
+      <element name="FUT" id="Future"/>
+      <element name="MLEG" id="MultiLegInstrument"/>
+      <element name="VAR" id="VarianceFutures"/>
+      <element name="TRF" id="TotalReturnFutures"/>
+      <element name="CS" id="CommonStock"/>
+      <element name="BOND" id="Bond"/>
+      <element name="TARP" id="TradeAtReferencePrice"/>
+      <element name="ETF" id="ExchangeTradedFund"/>
+      <element name="ETC" id="ExchangeTradedCommodity"/>
+      <element name="ETN" id="ExchangeTradedNote"/>
+      <element name="WAR" id="Warrant"/>
+      <element name="OTHER" id="Other"/>
+      <element name="SR" id="SubscriptionRight"/>
+      <element name="FUN" id="InvestmentFunds"/>
+    </enum>
+  </define>
+  <define name="ProductComplex">
+    <enum>
+      <element name="1" id="SimpleInstrument"/>
+      <element name="2" id="StandardOptionStrategy"/>
+      <element name="3" id="NonStandardOptionStrategy"/>
+      <element name="4" id="VolatilityStrategy"/>
+      <element name="5" id="FuturesSpread"/>
+      <element name="6" id="InterProductSpread"/>
+      <element name="7" id="StandardFuturesStrategy"/>
+      <element name="8" id="PackAndBundle"/>
+      <element name="9" id="Strip"/>
+      <element name="10" id="FlexibleInstrument"/>
+    </enum>
+  </define>
+  <define name="SecurityStatus">
+    <enum>
+      <element name="1" id="Active"/>
+      <element name="2" id="Inactive"/>
+      <element name="4" id="Expired"/>
+      <element name="6" id="KnockedOut"/>
+      <element name="7" id="KnockOutRevoked"/>
+      <element name="9" id="Suspended"/>
+      <element name="10" id="Published"/>
+      <element name="11" id="PendingDeletion"/>
+      <element name="12" id="KnockedOutAndSuspended"/>
+    </enum>
+  </define>
+  <define name="ContractCycleType">
+    <enum>
+      <element name="1" id="Daily"/>
+      <element name="2" id="Weekly"/>
+      <element name="3" id="Monthly"/>
+      <element name="4" id="Quarterly"/>
+      <element name="5" id="SemiAnnually"/>
+      <element name="6" id="Yearly"/>
+    </enum>
+  </define>
+  <define name="ContractDisplayInstruction">
+    <enum>
+      <element name="0" id="None"/>
+      <element name="1" id="Date"/>
+      <element name="2" id="Month"/>
+      <element name="3" id="Permanent"/>
+      <element name="4" id="Quarter"/>
+      <element name="5" id="Season"/>
+      <element name="6" id="Week"/>
+      <element name="7" id="Year"/>
+    </enum>
+  </define>
+  <define name="PutOrCall">
+    <enum>
+      <element name="0" id="Put"/>
+      <element name="1" id="Call"/>
+    </enum>
+  </define>
+  <define name="ExerciseStyle">
+    <enum>
+      <element name="0" id="European"/>
+      <element name="1" id="American"/>
+    </enum>
+  </define>
+  <define name="LepoFlag">
+    <enum>
+      <element name="N" id="No"/>
+      <element name="Y" id="Yes"/>
+    </enum>
+  </define>
+  <define name="ValuationMethod">
+    <enum>
+      <element name="EQTY" id="PremiumStyle"/>
+      <element name="FUT" id="FuturesStyleMarkToMarket"/>
+    </enum>
+  </define>
+  <define name="SettlMethod">
+    <enum>
+      <element name="C" id="Cash"/>
+      <element name="P" id="Physical"/>
+    </enum>
+  </define>
+  <define name="SettlSubMethod">
+    <enum>
+      <element name="1" id="Shares"/>
+      <element name="2" id="Derivatives"/>
+      <element name="3" id="PaymentVsPayment"/>
+      <element name="4" id="Notional"/>
+      <element name="5" id="Cascade"/>
+      <element name="99" id="Other"/>
+    </enum>
+  </define>
+  <define name="LegSecurityType">
+    <enum>
+      <element name="MLEG" id="PartOfMultilegInstrument"/>
+      <element name="ULEG" id="UnderlyingLeg"/>
+    </enum>
+  </define>
+  <define name="Side">
+    <enum>
+      <element name="1" id="Buy"/>
+      <element name="2" id="Sell"/>
+    </enum>
+  </define>
+  <define name="AssetType">
+    <enum>
+      <element name="0" id="EmissionAllowances"/>
+      <element name="1" id="Other"/>
+    </enum>
+  </define>
+  <define name="AssetSubType">
+    <enum>
+      <element name="0" id="EUAE"/>
+      <element name="1" id="CERE"/>
+      <element name="2" id="ERUE"/>
+      <element name="3" id="EUAA"/>
+      <element name="4" id="Other"/>
+    </enum>
+  </define>
+  <define name="DepositType">
+    <enum>
+      <element name="1" id="AUSLANDSKASSENVEREIN"/>
+      <element name="2" id="GIROSAMMELVERWAHRUNG"/>
+      <element name="3" id="STREIFBANDVERWAHRUNG"/>
+      <element name="4" id="WERTPAPIERRECHNUNG"/>
+      <element name="5" id="NCSCviaT2S"/>
+    </enum>
+  </define>
+  <define name="InstrumentAuctionType">
+    <enum>
+      <element name="0" id="Default"/>
+      <element name="1" id="SingleAuction"/>
+      <element name="2" id="SpecialAuction"/>
+    </enum>
+  </define>
+  <define name="InstrumentPartyIdSourceType">
+    <enum>
+      <element name="D" id="Proprietary"/>
+    </enum>
+  </define>
+  <define name="InstrumentPartyRoleType">
+    <enum>
+      <element name="21" id="ClearingOrganization"/>
+      <element name="66" id="MarketMaker"/>
+    </enum>
+  </define>
+  <define name="InstrumentPartyRoleQualifierType">
+    <enum>
+      <element name="20" id="DesignatedSponsor"/>
+      <element name="21" id="Specialist"/>
+    </enum>
+  </define>
+  <define name="AccruedInterestCalculationMethod">
+    <enum>
+      <element name="1" id="Basis30360"/>
+      <element name="3" id="M30360"/>
+      <element name="6" id="Act360"/>
+      <element name="7" id="Act365Fixed"/>
+      <element name="8" id="ActActAFB"/>
+      <element name="9" id="ActActIcma"/>
+      <element name="11" id="ActActIsda"/>
+      <element name="14" id="Act365L"/>
+    </enum>
+  </define>
+  <define name="CouponType">
+    <enum>
+      <element name="1" id="Zero"/>
+      <element name="2" id="FixedRate"/>
+      <element name="3" id="FloatingRate"/>
+      <element name="4" id="Structured"/>
+    </enum>
+  </define>
+  <define name="FlatIndicator">
+    <enum>
+      <element name="1" id="NoFlat"/>
+      <element name="2" id="Flat"/>
+      <element name="3" id="XFlat"/>
+    </enum>
+  </define>
+  <define name="WarrantType">
+    <enum>
+      <element name="1" id="CALL"/>
+      <element name="2" id="PUT"/>
+      <element name="3" id="RANGE"/>
+      <element name="4" id="CERTIFICATE"/>
+      <element name="5" id="OTHER"/>
+    </enum>
+  </define>
+  <define name="CoverIndicator">
+    <enum>
+      <element name="1" id="Intraday"/>
+      <element name="2" id="Longterm"/>
+      <element name="3" id="Activated"/>
+    </enum>
+  </define>
+  <define name="InstrumentAttributeType">
+    <enum>
+      <element name="100" id="MinimumReserveOrderVolume"/>
+      <element name="101" id="MinimumDisplayVolume"/>
+      <element name="102" id="IssuerName"/>
+      <element name="103" id="IssuerNumber"/>
+      <element name="104" id="MarketType"/>
+      <element name="105" id="MarketTypeSupplement"/>
+      <element name="106" id="ReportingMarket"/>
+      <element name="107" id="CumExIndicator"/>
+      <element name="108" id="ProductAssignmentGroup"/>
+      <element name="109" id="ProductAssignmentGroupDescription"/>
+      <element name="110" id="DomesticIndicator"/>
+      <element name="111" id="PreTradeLISValue"/>
+      <element name="112" id="IlliquidAsDefinedByExchange"/>
+      <element name="113" id="MarketMakingObligation"/>
+      <element name="114" id="LiquidAsDefinedByRegulator"/>
+      <element name="115" id="EligibleForStressedMarketConditions"/>
+      <element name="117" id="MultiCCPEligible"/>
+      <element name="118" id="PoolFactor"/>
+      <element name="119" id="IndexationCoefficient"/>
+      <element name="120" id="TradingOnTermsOfIssue"/>
+      <element name="121" id="IssuerBusinessUnit"/>
+      <element name="122" id="AllowKnockOut"/>
+      <element name="123" id="HasPLP"/>
+      <element name="124" id="PLPDeferralTime"/>
+      <element name="125" id="WarrantStrike"/>
+      <element name="126" id="ReportingMarketTES"/>
+      <element name="127" id="LiquidityProviderUserGroup"/>
+      <element name="128" id="SpecialistUserGroup"/>
+      <element name="129" id="LiquidityClass"/>
+    </enum>
+  </define>
+  <define name="EventType">
+    <enum>
+      <element name="7" id="LastEligibleTradeDate"/>
+      <element name="100" id="FirstEligibleTradeDate"/>
+      <element name="101" id="CapitalAdjustmentDate"/>
+      <element name="102" id="DividendPaymentDate"/>
+      <element name="115" id="FinalSettlementReferenceDate"/>
+    </enum>
+  </define>
+  <define name="ImpliedMarketIndicator">
+    <enum>
+      <element name="0" id="NotImplied"/>
+      <element name="3" id="BothImpliedInAndImpliedOut"/>
+    </enum>
+  </define>
+  <define name="MultilegModel">
+    <enum>
+      <element name="0" id="PredefinedMultilegSecurity"/>
+      <element name="1" id="UserDefinedMultilegSecurity"/>
+    </enum>
+  </define>
+  <define name="PriceType">
+    <enum>
+      <element name="1" id="Percent"/>
+      <element name="2" id="Shares"/>
+      <element name="22" id="Points"/>
+    </enum>
+  </define>
+  <define name="PostTradeAnonymityType">
+    <enum>
+      <element name="0" id="Disabled"/>
+      <element name="1" id="Enabled"/>
+      <element name="2" id="CentralCounterparty"/>
+    </enum>
+  </define>
+  <define name="TradingSessionID">
+    <enum>
+      <element name="1" id="Day"/>
+      <element name="3" id="Morning"/>
+      <element name="5" id="Evening"/>
+      <element name="6" id="AfterHours"/>
+      <element name="7" id="Holiday"/>
+    </enum>
+  </define>
+  <define name="TradingSessionSubID">
+    <enum>
+      <element name="1" id="PreTrading"/>
+      <element name="3" id="Continuous"/>
+      <element name="4" id="Closing"/>
+      <element name="5" id="PostTrading"/>
+      <element name="6" id="ScheduledIntradayAuction"/>
+      <element name="7" id="Quiescent"/>
+      <element name="8" id="AnyAuction"/>
+      <element name="103" id="ContinuousAuctionIssuer"/>
+      <element name="104" id="ContinuousAuctionSpecialist"/>
+    </enum>
+  </define>
+
+  <template id="123" name="InstrumentSnapshot">
+    <string name="MsgType" id="35">
+      <constant value="d"/>
+    </string>
+    <uInt32 name="MsgSeqNum" id="34">
+      <increment/>
+    </uInt32>
+    <int64 name="SecurityID" id="48">
+      <delta/>
+    </int64>
+    <string name="SecurityIDSource" id="22">
+      <constant value="M"/>
+    </string>
+    <sequence name="SecurityAlt" presence="optional">
+      <length name="NoSecurityAltID" id="454"/>
+      <string name="SecurityAltID" id="455">
+        <delta/>
+      </string>
+      <string name="SecurityAltIDSource" id="456">
+        <copy/>
+      </string>
+    </sequence>
+    <field name="SecurityType" id="167">
+      <type name="SecurityType">
+        <copy/>
+      </type>
+    </field>
+    <field name="SecurityStatus" id="965">
+      <type name="SecurityStatus">
+        <copy/>
+      </type>
+    </field>
+    <string name="SecurityDesc" id="107" presence="optional">
+      <delta/>
+    </string>
+    <string name="SecurityExchange" id="207" presence="optional">
+      <copy/>
+    </string>
+    <field name="ProductComplex" id="1227">
+      <type name="ProductComplex">
+        <copy/>
+      </type>
+    </field>
+    <group name="DerivativesDescriptorGroup" presence="optional">
+      <string name="CFICode" id="461">
+        <copy/>
+      </string>
+      <group name="SimpleInstrumentDescriptorGroup" presence="optional">
+        <uInt32 name="ContractDate" id="30866" presence="optional">
+          <copy/>
+        </uInt32>
+        <uInt32 name="ContractMonthYear" id="32340" presence="optional">
+          <copy/>
+        </uInt32>
+        <uInt32 name="ContractWeek" id="25187" presence="optional">
+          <copy/>
+        </uInt32>
+        <uInt32 name="ContractWeekYear" id="25188" presence="optional">
+          <copy/>
+        </uInt32>
+        <uInt32 name="ContractQuarter" id="25189" presence="optional">
+          <copy/>
+        </uInt32>
+        <field name="ContractCycleType" id="30865" presence="optional">
+          <type name="ContractCycleType">
+            <copy/>
+          </type>
+        </field>
+        <field name="ContractDisplayInstruction" id="25186" presence="optional">
+          <type name="ContractDisplayInstruction">
+            <copy/>
+          </type>
+        </field>
+        <decimal name="StrikePrice" id="202" presence="optional">
+          <copy/>
+        </decimal>
+        <uInt32 name="StrikePricePrecision" id="2577" presence="optional">
+          <copy/>
+        </uInt32>
+        <decimal name="ContractMultiplier" id="231" presence="optional">
+          <copy/>
+        </decimal>
+        <field name="PutOrCall" id="201" presence="optional">
+          <type name="PutOrCall">
+            <default value="0"/>
+          </type>
+        </field>
+        <uInt32 name="OptAttribute" id="206" presence="optional">
+          <copy/>
+        </uInt32>
+        <field name="ExerciseStyle" id="1194" presence="optional">
+          <type name="ExerciseStyle">
+            <copy/>
+          </type>
+        </field>
+        <decimal name="OrigStrikePrice" id="2578" presence="optional">
+          <copy/>
+        </decimal>
+        <uInt32 name="ContractGenerationNumber" id="25034" presence="optional">
+          <copy/>
+        </uInt32>
+        <field name="LowExercisePriceOptionIndicator" id="2574" presence="optional">
+          <type name="LepoFlag">
+            <default value="0"/>
+          </type>
+        </field>
+        <field name="ValuationMethod" id="1197" presence="optional">
+          <type name="ValuationMethod">
+            <copy/>
+          </type>
+        </field>
+        <field name="SettlMethod" id="1193" presence="optional">
+          <type name="SettlMethod">
+            <copy/>
+          </type>
+        </field>
+        <field name="SettlSubMethod" id="2579" presence="optional">
+          <type name="SettlSubMethod">
+            <copy/>
+          </type>
+        </field>
+        <decimal name="PriorSettlPrice" id="734" presence="optional">
+          <copy/>
+        </decimal>
+        <string name="Symbol" id="55" presence="optional">
+          <copy/>
+        </string>
+      </group>
+      <group name="ComplexInstrumentDescriptorGroup" presence="optional">
+        <uInt32 name="LegRatioMultiplier" id="28900" presence="optional">
+          <default/>
+        </uInt32>
+        <sequence name="InstrmtLegGrp">
+          <length name="NoLegs" id="555">
+            <copy/>
+          </length>
+          <uInt32 name="LegSymbol" id="600">
+            <copy/>
+          </uInt32>
+          <int64 name="LegSecurityID" id="602">
+            <delta/>
+          </int64>
+          <string name="LegSecurityIDSource" id="603">
+            <constant value="M"/>
+          </string>
+          <field name="LegSecurityType" id="609">
+            <type name="LegSecurityType">
+              <default value="0"/>
+            </type>
+          </field>
+          <field name="LegSide" id="624">
+            <type name="Side">
+              <default value="0"/>
+            </type>
+          </field>
+          <uInt32 name="LegRatioQty" id="623">
+            <default value="1"/>
+          </uInt32>
+          <decimal name="LegPrice" id="566" presence="optional">
+            <copy/>
+          </decimal>
+        </sequence>
+      </group>
+      <group name="UnderlyingInstrument" presence="optional">
+        <uInt32 name="UnderlyingMarketSegmentID" id="31300">
+          <copy/>
+        </uInt32>
+        <int64 name="UnderlyingSecurityID" id="309"/>
+        <string name="UnderlyingSecurityIDSource" id="305">
+          <constant value="M"/>
+        </string>
+      </group>
+      <string name="UnitOfMeasure" id="996" presence="optional">
+        <copy/>
+      </string>
+      <field name="AssetType" id="1940" presence="optional">
+        <type name="AssetType">
+          <copy/>
+        </type>
+      </field>
+      <field name="AssetSubType" id="29831" presence="optional">
+        <type name="AssetSubType">
+          <copy/>
+        </type>
+      </field>
+      <timestamp name="TransactTime" unit="nanosecond" id="60" presence="optional">
+        <delta/>
+      </timestamp>
+    </group>
+    <group name="CashDescriptorGroup" presence="optional">
+      <uInt32 name="RefTickTableID" id="1787">
+        <copy/>
+      </uInt32>
+      <string name="Currency" id="15">
+        <default value="EUR"/>
+      </string>
+      <string name="SettlCurrency" id="120">
+        <default value="EUR"/>
+      </string>
+      <field name="DepositType" id="28890" presence="optional">
+        <type name="DepositType">
+          <copy/>
+        </type>
+      </field>
+      <string name="Issuer" id="106" presence="optional"/>
+      <uInt32 name="IssueDate" id="225" presence="optional"/>
+      <decimal name="RoundLot" id="561" presence="optional">
+        <copy/>
+      </decimal>
+      <decimal name="MinTradeVol" id="562" presence="optional">
+        <copy/>
+      </decimal>
+      <string name="QuotingStartTime" id="30341" presence="optional">
+        <copy/>
+      </string>
+      <string name="QuotingEndTime" id="30345" presence="optional">
+        <copy/>
+      </string>
+      <field name="InstrumentAuctionType" id="31803" presence="optional">
+        <type name="InstrumentAuctionType">
+          <copy/>
+        </type>
+      </field>
+      <sequence name="InstrumentParties" presence="optional">
+        <length name="NoInstrumentParties" id="1018"/>
+        <string name="InstrumentPartyID" id="1019">
+          <copy/>
+        </string>
+        <field name="InstrumentPartyIDSource" id="1050">
+          <type name="InstrumentPartyIdSourceType">
+            <copy/>
+          </type>
+        </field>
+        <field name="InstrumentPartyRole" id="1051">
+          <type name="InstrumentPartyRoleType">
+            <copy/>
+          </type>
+        </field>
+        <field name="InstrumentPartyRoleQualifier" id="2378" presence="optional">
+          <type name="InstrumentPartyRoleQualifierType">
+            <copy/>
+          </type>
+        </field>
+      </sequence>
+      <group name="BondsAndWarrantsGroup" presence="optional">
+        <string name="UnderlyingSymbol" id="311" presence="optional">
+          <delta/>
+        </string>
+        <decimal name="CouponRate" id="223" presence="optional">
+          <copy/>
+        </decimal>
+        <uInt32 name="PreviousCouponPaymentDate" id="28895" presence="optional">
+          <copy/>
+        </uInt32>
+        <uInt32 name="CouponPaymentDate" id="224" presence="optional">
+          <copy/>
+        </uInt32>
+        <field name="CouponDayCount" id="1950" presence="optional">
+          <type name="AccruedInterestCalculationMethod">
+            <copy/>
+          </type>
+        </field>
+        <field name="CouponType" id="1946" presence="optional">
+          <type name="CouponType">
+            <copy/>
+          </type>
+        </field>
+        <string name="CountryOfIssue" id="470" presence="optional">
+          <copy/>
+        </string>
+        <field name="FlatIndicator" id="25170" presence="optional">
+          <type name="FlatIndicator">
+            <copy/>
+          </type>
+        </field>
+        <field name="WarrantType" id="30762" presence="optional">
+          <type name="WarrantType">
+            <copy/>
+          </type>
+        </field>
+        <field name="CoverIndicator" id="25200" presence="optional">
+          <type name="CoverIndicator">
+            <copy/>
+          </type>
+        </field>
+      </group>
+    </group>
+    <sequence name="InstrumentAttributes" presence="optional">
+      <length name="NoInstrAttrib" id="870"/>
+      <field name="InstrAttribType" id="871">
+        <type name="InstrumentAttributeType">
+          <copy/>
+        </type>
+      </field>
+      <string name="InstrAttribValue" id="872">
+        <copy/>
+      </string>
+    </sequence>
+    <sequence name="Events" presence="optional">
+      <length name="NoEvents" id="864"/>
+      <field name="EventType" id="865">
+        <type name="EventType">
+          <default value="0"/>
+        </type>
+      </field>
+      <uInt32 name="EventDate" id="866">
+        <copy/>
+      </uInt32>
+    </sequence>
+    <uInt32 name="InstrumentPricePrecision" id="2576" presence="optional">
+      <copy/>
+    </uInt32>
+    <decimal name="MinPriceIncrement" id="969" presence="optional">
+      <copy/>
+    </decimal>
+    <decimal name="MinPriceIncrementClearing" id="28888" presence="optional">
+      <copy/>
+    </decimal>
+    <decimal name="MinPriceIncrementAmount" id="1146" presence="optional">
+      <copy/>
+    </decimal>
+    <uInt32 name="MaturityDate" id="541" presence="optional">
+      <copy/>
+    </uInt32>
+    <uInt32 name="MaturityMonthYear" id="200" presence="optional">
+      <copy/>
+    </uInt32>
+    <uInt32 name="SecuritySubType" id="762" presence="optional">
+      <copy/>
+    </uInt32>
+    <sequence name="MarketSegmentGrp">
+      <length name="NoMarketSegments" id="1310">
+        <constant value="1"/>
+      </length>
+      <uInt32 name="MarketSegmentID" id="1300">
+        <copy/>
+      </uInt32>
+      <field name="ImpliedMarketIndicator" id="1144" presence="optional">
+        <type name="ImpliedMarketIndicator">
+          <copy/>
+        </type>
+      </field>
+      <field name="MultilegModel" id="1377" presence="optional">
+        <type name="MultilegModel">
+          <copy/>
+        </type>
+      </field>
+      <field name="PriceType" id="423" presence="optional">
+        <type name="PriceType">
+          <copy/>
+        </type>
+      </field>
+      <field name="PostTradeAnonymity" id="28876" presence="optional">
+        <type name="PostTradeAnonymityType">
+          <copy/>
+        </type>
+      </field>
+      <uInt32 name="SettlBusinessDays" id="28878" presence="optional">
+        <default value="0"/>
+      </uInt32>
+      <sequence name="QuoteSizeRules" presence="optional">
+        <length name="NoQuoteSizeRules" id="2558">
+          <constant value="1"/>
+        </length>
+        <decimal name="MinBidSize" id="647">
+          <copy/>
+        </decimal>
+        <decimal name="MinOfferSize" id="648">
+          <copy/>
+        </decimal>
+      </sequence>
+      <sequence name="PriceRangeRules" presence="optional">
+        <length name="NoPriceRangeRules" id="2550">
+          <constant value="1"/>
+        </length>
+        <uInt32 name="PriceRangeRuleID" id="2556">
+          <copy/>
+        </uInt32>
+      </sequence>
+      <sequence name="TradingSessionRules" presence="optional">
+        <length name="NoTradingSessionRules" id="1309">
+          <constant value="1"/>
+        </length>
+        <field name="TradingSessionID" id="336">
+          <type name="TradingSessionID">
+            <constant value="0"/>
+          </type>
+        </field>
+        <field name="TradingSessionSubID" id="625">
+          <type name="TradingSessionSubID">
+            <copy/>
+          </type>
+        </field>
+      </sequence>
+    </sequence>
+  </template>
+
 </templates>
