@@ -3,6 +3,7 @@
 //
 // This file is part of mFAST.
 // See the file license.txt for licensing information.
+#include <optional>
 #include "field_builder.h"
 #include "field_op.h"
 #include "../exceptions.h"
