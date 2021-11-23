@@ -702,6 +702,26 @@ void field_builder::visit(const set_field_instruction *inst, void *)
       (alloc().allocate(names.size() * sizeof(const char*)));
     std::copy(names.begin(), names.end(), set_element_names);
   }
+  else
+    if (init_value_str)
+    {
+      std::optional<std::uint64_t> value_int;
+      try
+      {
+        value_int = std::stoul(init_value_str);
+      } catch (...) {}
+      if (value_int)
+        fop.initial_value_.set<uint64_t>(*value_int);
+      else
+      {
+        for (auto i = 0ul; i < num_elements; ++i)
+          if (std::strcmp(set_element_names[i], init_value_str) == 0)
+          {
+            fop.initial_value_.set<uint64_t>(1 << i);
+            break;
+          }
+      }
+    }
 
   auto instruction = new (alloc()) set_field_instruction(
       fop.op_, get_presence(inst), get_id(inst), get_name(alloc()),

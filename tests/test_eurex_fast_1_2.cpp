@@ -82,6 +82,7 @@ TEST_CASE("eurex sets", "[test_eurex_sets]")
 
   DepthIncremental md(&alloc);
   DepthIncremental_mref md_mref(md.mref());
+  REQUIRE(md_mref.get_TradeCondition().value() == 1);
   REQUIRE(md_mref.get_TradeCondition().has_ExchangeLast());
   md_mref.omit_TradeCondition();
   REQUIRE_THROWS_AS(md_mref.try_get_TradeCondition(), const mfast::bad_optional_access&);
@@ -94,10 +95,12 @@ TEST_CASE("eurex sets", "[test_eurex_sets]")
   REQUIRE(!md_mref.get_TradeCondition().has_LowPrice());
   REQUIRE(md_mref.get_TradeCondition().has_TradeAtClose());
   md_mref.set_TradeCondition().unset_TradeAtClose();
-  md_mref.set_TradeConditionSet().set_VolumeOnly();
-  REQUIRE(!md_mref.get_TradeCondition().has_LowPrice());
-  REQUIRE(!md_mref.get_TradeCondition().has_TradeAtClose());
-  REQUIRE(md_mref.get_TradeConditionSet().has_VolumeOnly());
+  REQUIRE(md_mref.set_TradeConditionSet().value() == 9);
+  REQUIRE(md_mref.get_TradeConditionSet().has_ExchangeLast());
+  REQUIRE(!md_mref.get_TradeConditionSet().has_HighPrice());
+  REQUIRE(md_mref.get_TradeConditionSet().has_LowPrice());
+  REQUIRE(!md_mref.get_TradeConditionSet().has_OfficialClosingPrice());
+  REQUIRE(!md_mref.get_TradeConditionSet().has_TradeAtClose());
 }
 
 
