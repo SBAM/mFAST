@@ -33,7 +33,7 @@ if (BUILD_SHARED_LIBS)
 
   if (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     target_compile_definitions(mfast_xml_parser INTERFACE "-DMFAST_DYN_LINK")
-  endif (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
+  endif()
 
   if (CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     set_target_properties(mfast_xml_parser PROPERTIES COMPILE_FLAGS -fvisibility=hidden)
@@ -46,7 +46,7 @@ if (BUILD_SHARED_LIBS)
                         SOVERSION "${MFAST_SOVERSION}")
   if ("${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     set_target_properties(mfast_xml_parser PROPERTIES COMPILE_FLAGS -DMFAST_DYN_LINK)
-  endif ("${CMAKE_VERSION}" VERSION_LESS "2.8.12")
+  endif()
 
   install(TARGETS mfast_xml_parser
           EXPORT  mFASTTargets
@@ -56,7 +56,7 @@ if (BUILD_SHARED_LIBS)
 
   set(MFAST_SHARED_LIBRARIES ${MFAST_SHARED_LIBRARIES} mfast_xml_parser CACHE INTERNAL "")
   set(MFAST_DYNAMIC_COMPONENTS ${MFAST_DYNAMIC_COMPONENTS} xml_parser CACHE INTERNAL "")
-endif (BUILD_SHARED_LIBS)
+endif()
 
 install(FILES mfast_xml_parser_export.h dynamic_templates_description.h
         DESTINATION "${INSTALL_INCLUDE_DIR}/mfast/xml_parser")

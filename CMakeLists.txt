@@ -14,7 +14,7 @@ option(STATIC_GEN "Static link fast type generator" OFF)
 # debug build by default
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -37,13 +37,13 @@ if(BUILD_PACKAGES)
   # Build deb package by default
   if(NOT CPACK_GENERATOR)
     set(CPACK_GENERATOR "DEB" CACHE STRING "List of generators.")
-  endif(NOT CPACK_GENERATOR)
+  endif()
 
   if(CUSTOM_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX ${CUSTOM_INSTALL_PREFIX} CACHE STRING "Custom installation prefix.")
     set(CPACK_SET_DESTDIR true)
     set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-  endif(CUSTOM_INSTALL_PREFIX)
+  endif()
 
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A FAST (FIX Adapted for STreaming) encoder/decoder")
   set(CPACK_PACKAGE_NAME "mfast")
@@ -54,8 +54,7 @@ if(BUILD_PACKAGES)
   set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 
   include(CPack)
-
-endif(BUILD_PACKAGES)
+endif()
 
 find_package(Boost 1.59.0 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
@@ -72,23 +71,29 @@ set(MFAST_STATIC_COMPONENTS CACHE INTERNAL "")
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
+# Setup conan dependencies if available
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup(TARGETS KEEP_RPATHS)
+endif()
+
 add_subdirectory (src)
 include(FastTypeGenTarget)
 
 if(BUILD_TESTS)
   enable_testing()
   add_subdirectory (tests)
-endif(BUILD_TESTS)
+endif()
 
 if (BUILD_SHARED_LIBS)
   set(MFAST_LIBRARIES "${MFAST_SHARED_LIBRARIES}")
-else (BUILD_SHARED_LIBS)
+else()
   set(MFAST_LIBRARIES "${MFAST_STATIC_LIBRARIES}")
-endif (BUILD_SHARED_LIBS)
+endif()
 
 if(BUILD_EXAMPLES)
   add_subdirectory (examples)
-endif(BUILD_EXAMPLES)
+endif()
 
 # Setting up dist target
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${MFAST_VERSION})

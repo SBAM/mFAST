@@ -30,7 +30,7 @@ if (BUILD_SHARED_LIBS)
 
   if (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     target_compile_definitions(mfast INTERFACE "-DMFAST_DYN_LINK")
-  endif (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
+  endif()
 
   if (CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     set_target_properties(mfast PROPERTIES COMPILE_FLAGS -fvisibility=hidden)
@@ -46,7 +46,7 @@ if (BUILD_SHARED_LIBS)
           LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib)
 
   set(MFAST_SHARED_LIBRARIES ${MFAST_SHARED_LIBRARIES} mfast CACHE INTERNAL "")
-endif (BUILD_SHARED_LIBS)
+endif ()
 
 add_subdirectory (coder)
 add_subdirectory (xml_parser)
@@ -54,7 +54,7 @@ add_subdirectory (json)
 
 if (BUILD_SQLITE3)
     add_subdirectory (sqlite3)
-endif(BUILD_SQLITE3)
+endif()
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         DESTINATION "${INSTALL_INCLUDE_DIR}"

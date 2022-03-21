@@ -22,7 +22,6 @@ class MfastConan(ConanFile):
   requires = "boost/[>=1.59.0]"
   generators = "cmake"
   exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "examples/*", "tests/*"
-  _cmake = None
 
   def configure(self):
     if self.options.shared:
@@ -36,25 +35,23 @@ class MfastConan(ConanFile):
     git_tinyxml2 = tools.Git(folder="tinyxml2")
     git_tinyxml2.clone("https://github.com/leethomason/tinyxml2.git")
 
-  def _get_cmake(self):
-    if self._cmake is None:
-      c = CMake(self)
-      #c.verbose = True
-      c.definitions["BUILD_TESTS"] = "ON" if self.options.build_tests else "OFF"
-      c.definitions["BUILD_EXAMPLES"] = "ON" if self.options.build_examples else "OFF"
-      c.definitions["BUILD_PACKAGES"] = "ON" if self.options.build_packages else "OFF"
-      c.definitions["STATIC_GEN"] = "ON" if not self.options.shared else "OFF"
-      c.configure()
-      self._cmake = c
-    return self._cmake
+  def configure_cmake(self):
+    cmake = CMake(self)
+    cmake.definitions["BUILD_TESTS"] = "ON" if self.options.build_tests else "OFF"
+    cmake.definitions["BUILD_EXAMPLES"] = "ON" if self.options.build_examples else "OFF"
+    cmake.definitions["BUILD_PACKAGES"] = "ON" if self.options.build_packages else "OFF"
+    cmake.definitions["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
+    cmake.definitions["STATIC_GEN"] = "ON" if not self.options.shared else "OFF"
+    cmake.configure()
+    return cmake
 
   def build(self):
-    c = self._get_cmake()
-    c.build()
+    cmake = self.configure_cmake()
+    cmake.build()
 
   def package(self):
-    c = self._get_cmake()
-    c.install()
+    cmake = self.configure_cmake()
+    cmake.install()
 
   def package_info(self):
     self.cpp_info.libs = ["mfast"]

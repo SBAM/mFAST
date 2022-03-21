@@ -39,7 +39,7 @@ if (BUILD_SHARED_LIBS)
 
   if (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     target_compile_definitions(mfast_coder INTERFACE "-DMFAST_DYN_LINK")
-  endif (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
+  endif()
 
   if (CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
     set_target_properties(mfast_coder PROPERTIES COMPILE_FLAGS -fvisibility=hidden)
@@ -50,7 +50,7 @@ if (BUILD_SHARED_LIBS)
                         SOVERSION "${MFAST_SOVERSION}")
   if ("${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     set_target_properties(mfast_coder PROPERTIES COMPILE_FLAGS -DMFAST_DYN_LINK)
-  endif ("${CMAKE_VERSION}" VERSION_LESS "2.8.12")
+  endif()
 
   install(TARGETS mfast_coder
           EXPORT  mFASTTargets
@@ -60,7 +60,7 @@ if (BUILD_SHARED_LIBS)
 
   set(MFAST_SHARED_LIBRARIES ${MFAST_SHARED_LIBRARIES} mfast_coder CACHE INTERNAL "")
   set(MFAST_DYNAMIC_COMPONENTS ${MFAST_DYNAMIC_COMPONENTS} coder CACHE INTERNAL "")
-endif (BUILD_SHARED_LIBS)
+endif()
 
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         DESTINATION "${INSTALL_INCLUDE_DIR}/mfast"
