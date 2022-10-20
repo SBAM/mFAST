@@ -21,7 +21,8 @@ class MfastConan(ConanFile):
                       "build_packages": False }
   requires = "boost/[>=1.59.0]"
   generators = "cmake"
-  exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "examples/*", "tests/*"
+  exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "examples/*", "tests/*", \
+    "!CMakeFiles", "!cmake_install.cmake"
 
   def configure(self):
     if self.options.shared:
