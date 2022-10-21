@@ -10,6 +10,8 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 set(mfast_SRCS  ${sources} ${instruction_sources} ${headers} ${instruction_headers})
 
 add_library(mfast_static STATIC ${mfast_SRCS})
+target_link_libraries(mfast_static PUBLIC Boost::headers)
+target_compile_definitions(mfast_static PRIVATE BOOST_NO_CXX98_FUNCTION_BASE)
 target_include_directories(mfast_static PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>)
 
 if (UNIX)
@@ -27,6 +29,7 @@ set(MFAST_STATIC_LIBRARIES ${MFAST_STATIC_LIBRARIES} mfast_static CACHE INTERNAL
 
 if (BUILD_SHARED_LIBS)
   add_library(mfast SHARED ${mfast_SRCS})
+  target_compile_definitions(mfast PRIVATE BOOST_NO_CXX98_FUNCTION_BASE)
 
   if (NOT "${CMAKE_VERSION}" VERSION_LESS "2.8.12")
     target_compile_definitions(mfast INTERFACE "-DMFAST_DYN_LINK")
