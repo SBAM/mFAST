@@ -20,7 +20,7 @@
 #include <optional>
 #include <unordered_set>
 
-#include "catch.hpp"
+#include "catch_fwd.hpp"
 
 #include <mfast.h>
 #include <mfast/coder/fast_decoder_v2.h>
@@ -49,11 +49,11 @@ TEST_CASE("eurex enums", "[test_eurex_enums]")
   REQUIRE(md_mref.get_MDStatisticStatus().value() ==  TypeMDStatisticStatus::Inactive);
   REQUIRE(md_mref.get_MDStatisticStatus().value_name() == "Inactive"s);
 
-  REQUIRE_THROWS_AS(md_mref.try_get_MDStatisticFrequencyUnit(), const mfast::bad_optional_access&);
+  REQUIRE_THROWS_AS(md_mref.try_get_MDStatisticFrequencyUnit(), mfast::bad_optional_access);
   md_mref.set_MDStatisticFrequencyUnit().as_Minutes();
   REQUIRE(md_mref.get_MDStatisticFrequencyUnit().is_Minutes());
   md_mref.omit_MDStatisticFrequencyUnit();
-  REQUIRE_THROWS_AS(md_mref.try_get_MDStatisticFrequencyUnit(), const mfast::bad_optional_access&);
+  REQUIRE_THROWS_AS(md_mref.try_get_MDStatisticFrequencyUnit(), mfast::bad_optional_access);
 
   REQUIRE(md_mref.get_MDStatisticIntervalUnit().is_Days());
   md_mref.set_MDStatisticIntervalUnit().as_MilliSeconds();
@@ -85,7 +85,7 @@ TEST_CASE("eurex sets", "[test_eurex_sets]")
   REQUIRE(md_mref.get_TradeCondition().value() == 1);
   REQUIRE(md_mref.get_TradeCondition().has_ExchangeLast());
   md_mref.omit_TradeCondition();
-  REQUIRE_THROWS_AS(md_mref.try_get_TradeCondition(), const mfast::bad_optional_access&);
+  REQUIRE_THROWS_AS(md_mref.try_get_TradeCondition(), mfast::bad_optional_access);
   md_mref.set_TradeCondition().set_LowPrice();
   REQUIRE(md_mref.get_TradeCondition().has_LowPrice());
   md_mref.set_TradeCondition().set_TradeAtClose();

@@ -17,7 +17,7 @@
 //     along with mFast.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "catch.hpp"
+#include "catch_fwd.hpp"
 
 #include <mfast/value_storage.h>
 using namespace mfast;

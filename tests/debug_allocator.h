@@ -18,7 +18,7 @@
 //
 #pragma once
 
-#include "catch.hpp"
+#include "catch_fwd.hpp"
 #include <mfast/malloc_allocator.h>
 #include <set>
 #include <cstring>

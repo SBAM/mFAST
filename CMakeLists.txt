@@ -24,6 +24,23 @@ set(MFAST_PATCH_VERSION 0)
 set(MFAST_VERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VERSION})
 set(MFAST_SOVERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VERSION})
 
+# Setup conan dependencies if available
+if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+  conan_basic_setup(KEEP_RPATHS NO_OUTPUT_DIRS)
+  find_package(Boost REQUIRED COMPONENTS headers)
+  find_package(tinyxml2 REQUIRED)
+  if(BUILD_TESTS)
+    find_package(Catch2 REQUIRED)
+  endif()
+else()
+  find_package(Boost 1.59.0 REQUIRED)
+  include_directories(${Boost_INCLUDE_DIR})
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
+  include_directories ("${PROJECT_SOURCE_DIR}/src")
+  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+endif()
+
 include(SetInstallPaths)
 include(Emscripten)
 include(SetCXXStandard)
@@ -56,11 +73,6 @@ if(BUILD_PACKAGES)
   include(CPack)
 endif()
 
-find_package(Boost 1.59.0 REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
-include_directories ("${PROJECT_SOURCE_DIR}/src")
-
 add_definitions(-DSIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})
 
 # variables to be used later
@@ -68,14 +80,6 @@ set(MFAST_SHARED_LIBRARIES CACHE INTERNAL "")
 set(MFAST_STATIC_LIBRARIES CACHE INTERNAL "")
 set(MFAST_DYNAMIC_COMPONENTS CACHE INTERNAL "")
 set(MFAST_STATIC_COMPONENTS CACHE INTERNAL "")
-
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-# Setup conan dependencies if available
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup(TARGETS KEEP_RPATHS)
-endif()
 
 add_subdirectory (src)
 include(FastTypeGenTarget)

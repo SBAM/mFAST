@@ -17,4 +17,9 @@
 //     along with mFast.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "catch_fwd.hpp"
+#if __has_include(<catch2/catch_test_macros.hpp>)
+# include <catch2/catch_test_macros.hpp>
+# include <catch2/catch_approx.hpp>
+#else
+# include <catch_amalgamated.hpp>
+#endif

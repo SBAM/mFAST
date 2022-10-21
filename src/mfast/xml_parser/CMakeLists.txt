@@ -6,12 +6,24 @@ file (GLOB_RECURSE sources "*.cpp")     ## retrieve all source files in current 
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
-include_directories("${CMAKE_SOURCE_DIR}/tinyxml2")
-
-set(mfast_xml_parser_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/../../../tinyxml2/tinyxml2.cpp ${sources} ${headers})
+if (tinyxml2_FOUND)
+  set(mfast_xml_parser_SRCS ${sources} ${headers})
+else()
+  include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/tinyxml2")
+  set(mfast_xml_parser_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/../../../tinyxml2/tinyxml2.cpp ${sources} ${headers})
+endif()
 
 add_library(mfast_xml_parser_static STATIC ${mfast_xml_parser_SRCS})
-target_link_libraries(mfast_xml_parser_static mfast_static)
+
+if (tinyxml2_FOUND)
+  target_link_libraries(mfast_xml_parser_static
+    PUBLIC
+      mfast_static
+    PRIVATE
+      tinyxml2::tinyxml2)
+else()
+  target_link_libraries(mfast_xml_parser_static mfast_static)
+endif()
 
 if (UNIX)
   set_target_properties(mfast_xml_parser_static PROPERTIES OUTPUT_NAME mfast_xml_parser)
@@ -39,7 +51,16 @@ if (BUILD_SHARED_LIBS)
     set_target_properties(mfast_xml_parser PROPERTIES COMPILE_FLAGS -fvisibility=hidden)
   endif()
 
-  target_link_libraries(mfast_xml_parser mfast)
+
+  if (tinyxml2_FOUND)
+    target_link_libraries(mfast_xml_parser
+      PUBLIC
+        mfast
+      PRIVATE
+        tinyxml2::tinyxml2)
+  else()
+    target_link_libraries(mfast_xml_parser mfast)
+  endif()
   set_target_properties(mfast_xml_parser PROPERTIES
                         LINKER_LANGUAGE CXX
                         VERSION "${MFAST_VERSION}"
