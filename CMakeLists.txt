@@ -10,6 +10,7 @@ option(BUILD_TESTS "Build tests" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_PACKAGES "Build packages" ON)
 option(STATIC_GEN "Static link fast type generator" OFF)
+option(IS_CONAN2_BUILD "Indicates if conan2 was used for build" OFF)
 
 # debug build by default
 if(NOT CMAKE_BUILD_TYPE)
@@ -25,12 +26,10 @@ set(MFAST_VERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VE
 set(MFAST_SOVERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VERSION})
 
 # Setup conan dependencies if available
-if(EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup(KEEP_RPATHS NO_OUTPUT_DIRS)
+if (IS_CONAN2_BUILD)
   find_package(Boost REQUIRED COMPONENTS headers)
   find_package(tinyxml2 REQUIRED)
-  if(BUILD_TESTS)
+  if (BUILD_TESTS)
     find_package(Catch2 REQUIRED)
   endif()
 else()

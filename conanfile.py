@@ -1,16 +1,18 @@
-from conans import CMake, ConanFile, tools
+from conan import ConanFile
+from conan.tools.cmake import cmake_layout, CMakeToolchain, CMake, CMakeDeps
+from conan.tools import build
+from pathlib import Path
 
 class MfastConan(ConanFile):
   name = "mfast"
-  version = "1.2.4"
+  version = "1.3.0"
   license = "BSD 3-Clause 'New' or 'Revised' License"
   author = "Object Computing, Inc. (info@ociweb.com)"
   url = "https://github.com/objectcomputing/mFAST"
   description = "A FAST (FIX Adapted for STreaming) encoder/decoder"
   topics = ("c++", "FIX", "FAST")
+  generators = "CMakeDeps"
   settings = "os", "compiler", "build_type", "arch"
-  requires = ( "boost/[>=1.69.0]",
-               "tinyxml2/9.0.0" )
   options = { "shared": [True, False],
               "fPIC": [True, False],
               "build_tests": [True, False],
@@ -21,35 +23,48 @@ class MfastConan(ConanFile):
                       "build_tests": False,
                       "build_examples": False,
                       "build_packages": False }
-  generators = "cmake", "cmake_find_package"
   exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "examples/*", "tests/*"
 
-  def configure(self):
+  def build_requirements(self):
+    if self.options.build_tests:
+      self.test_requires("catch2/3.1.0")
+
+  def requirements(self):
+    self.requires("boost/[>=1.69.0]")
+    self.requires("tinyxml2/9.0.0")
+
+  def config_options(self):
     if self.options.shared:
       del self.options.fPIC
 
-  def requirements(self):
-    if self.options.build_tests:
-      self.requires("catch2/3.1.0")
+  def layout(self):
+    cmake_layout(self)
+
+  def generate(self):
+    tc = CMakeToolchain(self)
+    tc.user_presets_path = False
+    tc.variables["BUILD_TESTS"] = "ON" if self.options.build_tests else "OFF"
+    tc.variables["BUILD_EXAMPLES"] = "ON" if self.options.build_examples else "OFF"
+    tc.variables["BUILD_PACKAGES"] = "ON" if self.options.build_packages else "OFF"
+    tc.variables["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
+    tc.variables["STATIC_GEN"] = "ON" if not self.options.shared else "OFF"
+    tc.variables["IS_CONAN2_BUILD"] = "ON"
+    tc.generate()
 
   def build(self):
     cmake = CMake(self)
-    cmake.definitions["BUILD_TESTS"] = "ON" if self.options.build_tests else "OFF"
-    cmake.definitions["BUILD_EXAMPLES"] = "ON" if self.options.build_examples else "OFF"
-    cmake.definitions["BUILD_PACKAGES"] = "ON" if self.options.build_packages else "OFF"
-    cmake.definitions["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
-    cmake.definitions["STATIC_GEN"] = "ON" if not self.options.shared else "OFF"
-    cmake.configure(args=["--no-warn-unused-cli"])
+    cmake.configure()
     cmake.build()
-    cmake.install()
 
   def package(self):
-    # packaging taken care of above (with cmake install)
-    pass
+    cmake = CMake(self)
+    cmake.install()
 
   def package_info(self):
     self.cpp_info.libs = ["mfast"]
-    # no generator name provided, packaged CMake helpers are expected to be used
+    self.cpp_info.set_property("cmake_target_name", "mFAST::mFAST")
+    tmp_path = Path("lib")/"cmake"/"mFAST"/"FastTypeGenLib.cmake"
+    self.cpp_info.set_property("cmake_build_modules", [ tmp_path ])
 
   def validate(self):
-    tools.check_min_cppstd(self, "17")
+    build.check_min_cppstd(self, "17")

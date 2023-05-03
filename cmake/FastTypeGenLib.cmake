@@ -22,7 +22,7 @@ function(FASTTYPEGEN_LIB
     ${CMAKE_CURRENT_BINARY_DIR}/${input_noext}.${inl_ext})
 
   add_custom_command(OUTPUT ${mfast_generated_sources}
-    COMMAND $<TARGET_FILE:fast_type_gen>
+    COMMAND fast_type_gen
             -n ${namespace} # outer namespace
             -H .${hdr_ext}  # headers extension
             -I .${inl_ext}  # inline headers extension
