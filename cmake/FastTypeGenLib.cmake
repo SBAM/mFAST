@@ -5,6 +5,14 @@
 #============================================================
 #
 
+if (NOT TARGET fast_type_gen)
+  get_filename_component(GEN_LIB_LOCATION "${CMAKE_CURRENT_LIST_FILE}" PATH)
+  add_executable(fast_type_gen IMPORTED)
+  set_target_properties(fast_type_gen PROPERTIES IMPORTED_LOCATION
+    "${GEN_LIB_LOCATION}/../../../bin/fast_type_gen")
+endif()
+
+
 function(FASTTYPEGEN_LIB
     input     # path to fast template
     output    # ouput library name
@@ -22,7 +30,7 @@ function(FASTTYPEGEN_LIB
     ${CMAKE_CURRENT_BINARY_DIR}/${input_noext}.${inl_ext})
 
   add_custom_command(OUTPUT ${mfast_generated_sources}
-    COMMAND fast_type_gen
+    COMMAND $<TARGET_FILE:fast_type_gen>
             -n ${namespace} # outer namespace
             -H .${hdr_ext}  # headers extension
             -I .${inl_ext}  # inline headers extension

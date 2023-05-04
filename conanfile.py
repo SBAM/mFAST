@@ -61,7 +61,7 @@ class MfastConan(ConanFile):
     cmake.install()
 
   def package_info(self):
-    self.cpp_info.libs = ["mfast"]
+    self.cpp_info.libs = ["mfast", "mfast_coder"]
     self.cpp_info.set_property("cmake_target_name", "mFAST::mFAST")
     tmp_path = Path("lib")/"cmake"/"mFAST"/"FastTypeGenLib.cmake"
     self.cpp_info.set_property("cmake_build_modules", [ tmp_path ])
