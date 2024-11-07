@@ -169,9 +169,9 @@ bool get_quoted_string(std::istream &strm, std::string *pstr,
 
             strm.get();
 
-            const char *buf = "\\u";
+            const char *buf_bsu = "\\u";
             if (pref)
-              pref->insert(pref->end(), buf, buf + 2);
+              pref->insert(pref->end(), buf_bsu, buf_bsu + 2);
             uint32_t val2 = read_4_hex_digits(strm, pref);
 
             if (is_low_surrogate(val2)) {
@@ -208,8 +208,6 @@ bool get_quoted_string(std::istream &strm, std::string *pstr,
           json_decode_error(strm, "Expect closing quotation mark"));
     }
   } while (1);
-  strm.setstate(std::ios::failbit);
-  return false;
 }
 
 bool skip_matching(std::istream &strm, char left_bracket,

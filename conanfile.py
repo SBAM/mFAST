@@ -5,7 +5,7 @@ from pathlib import Path
 
 class MfastConan(ConanFile):
   name = "mfast"
-  version = "1.3.0"
+  version = "1.3.1"
   license = "BSD 3-Clause 'New' or 'Revised' License"
   author = "Object Computing, Inc. (info@ociweb.com)"
   url = "https://github.com/objectcomputing/mFAST"
@@ -27,11 +27,11 @@ class MfastConan(ConanFile):
 
   def build_requirements(self):
     if self.options.build_tests:
-      self.test_requires("catch2/3.1.0")
+      self.test_requires("catch2/3.7.1")
 
   def requirements(self):
     self.requires("boost/[>=1.69.0]")
-    self.requires("tinyxml2/9.0.0")
+    self.requires("tinyxml2/10.0.0")
 
   def config_options(self):
     if self.options.shared:

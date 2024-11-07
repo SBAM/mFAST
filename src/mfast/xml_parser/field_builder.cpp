@@ -739,10 +739,10 @@ instruction_tag field_builder::parse_tag(const field_instruction *inst) {
     try {
       value |= boost::lexical_cast<uint64_t>(tag_);
     } catch (...) {
-      const enum_field_instruction *inst =
+      const enum_field_instruction *ef_inst =
           dynamic_cast<const enum_field_instruction *>(
               this->find_type(nullptr, "mfast:tag"));
-      if (inst) {
+      if (ef_inst) {
         // treat the input tag as a "|" delimited tokens
 
         boost::char_separator<char> sep("| ");
@@ -750,7 +750,7 @@ instruction_tag field_builder::parse_tag(const field_instruction *inst) {
         boost::tokenizer<boost::char_separator<char>> tokens(tag, sep);
         for (auto &&t : tokens) {
           uint64_t result;
-          if (parse_enum_value(inst, t.c_str(), result))
+          if (parse_enum_value(ef_inst, t.c_str(), result))
             value |= result;
           else
             BOOST_THROW_EXCEPTION(fast_error("invalid tag") << value_info(t));

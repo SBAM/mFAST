@@ -69,8 +69,8 @@ class debug_allocator
     {
 
       CHECK(leased_addresses_.count(pointer) !=0 );
-      std::free(pointer);
       leased_addresses_.erase(pointer);
+      std::free(pointer);
     }
 
   protected:

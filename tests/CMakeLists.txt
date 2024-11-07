@@ -72,7 +72,7 @@ else()
       mfast_coder_static
       mfast_json_static
       mfast_xml_parser_static
-      Catch2::Catch2)
+      Catch2::Catch2WithMain)
 endif()
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")

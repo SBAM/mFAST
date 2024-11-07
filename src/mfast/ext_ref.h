@@ -97,11 +97,14 @@ public:
   typedef BaseCRef cref_type;
   typedef typename cref_type::type_category type_category;
   typedef OpType operator_category;
+  typedef ext_ref_properties<OpType, Properties> ParentExtRefProp;
 
   explicit ext_cref(const field_cref &base) : base_(base) {}
   explicit ext_cref(const aggregate_cref &base) : base_(base) {}
   cref_type get() const { return base_; }
-  bool present() const { return !this->optional() || base_.present(); }
+  bool present() const {
+    return !static_cast<const ParentExtRefProp*>(this)->optional() || base_.present();
+  }
 
 private:
   cref_type base_;
@@ -128,7 +131,10 @@ public:
   exponent_type get_exponent() const {
     return exponent_type(base_.get_exponent());
   }
-  bool present() const { return !this->optional() || base_.present(); }
+  bool present() const {
+    return (!exponent_type::ParentExtRefProp::IsOptional &&
+            !mantissa_type::ParentExtRefProp::IsOptional) || base_.present();
+  }
 
 private:
   decimal_cref base_;

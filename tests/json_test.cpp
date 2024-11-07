@@ -111,9 +111,9 @@ TEST_CASE("test json_encode with product type","[json_encode_product_test]")
                         mfast_tag::JSON_UNKNOWN,
                         mfast_tag::JSON_IGNORE);
 
-    const char* result = "{\"name\":\"Foo\",\"price\":123.56,\"stock\":{\"warehouse\":300,\"retail\":20},\"ext\":{\"test1\":1}}";
+    const char* result2 = "{\"name\":\"Foo\",\"price\":123.56,\"stock\":{\"warehouse\":300,\"retail\":20},\"ext\":{\"test1\":1}}";
 
-    REQUIRE(ostrm.str() == result);
+    REQUIRE(ostrm.str() == result2);
   }
 
   debug_allocator alloc;

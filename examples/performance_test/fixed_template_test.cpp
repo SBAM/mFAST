@@ -49,7 +49,14 @@ const char usage[] =
 
 int read_file(const char* filename, std::vector<char>& contents)
 {
-  std::unique_ptr<FILE, decltype(&std::fclose)> fp{std::fopen(filename, "rb"), &std::fclose};
+  struct fclose_deleter
+  {
+    void operator()(std::FILE* f) const
+    {
+      std::fclose(f);
+    }
+  };
+  std::unique_ptr<FILE, fclose_deleter> fp{std::fopen(filename, "rb")};
   if (fp)
   {
     std::fseek(fp.get(), 0, SEEK_END);
