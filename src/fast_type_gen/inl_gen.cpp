@@ -25,11 +25,13 @@ std::string get_properties_type(const Instruction *inst) {
 using namespace mfast;
 struct ext_cref_type_getter : mfast::field_instruction_visitor {
   std::stringstream out_;
+  bool is_group_type_ = false;
 
 public:
   ext_cref_type_getter() {}
 
   std::string get() { return out_.str(); }
+  bool group_type() { return is_group_type_; }
 
   virtual void visit(const int32_field_instruction *inst, void *) override {
     out_ << "ext_cref<int32_cref, " << get_operator_tag(inst) << ", "
@@ -83,6 +85,7 @@ public:
   virtual void visit(const group_field_instruction *inst, void *) override {
     out_ << "ext_cref< " << codegen_base::cpp_name(inst)
          << "_cref,  group_type_tag, " << get_properties_type(inst) << ">";
+    is_group_type_ = true;
   }
 
   virtual void visit(const sequence_field_instruction *inst, void *) override;
@@ -135,6 +138,12 @@ std::string get_ext_cref_type(const field_instruction *inst) {
   ext_cref_type_getter getter;
   inst->accept(getter, nullptr);
   return getter.get();
+}
+
+bool is_group_type(const field_instruction *inst) {
+  ext_cref_type_getter getter;
+  inst->accept(getter, nullptr);
+  return getter.group_type();
 }
 
 void ext_cref_type_getter::visit(const sequence_field_instruction *inst,
@@ -482,9 +491,17 @@ void inl_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
 
     for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
       const field_instruction *subinst = inst->subinstructions()[i];
-      ;
-      out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)["
-           << i << "]) );\n";
+
+      if (is_group_type(subinst) && subinst->optional())
+      {
+        out_ << "  {\n"
+            << "    " << get_ext_cref_type(subinst) << " ext_cref_group((*this)[" << i << "]);\n"
+            << "    ext_cref_group.set_group_present(this->field_storage(" << i << ")->is_present());\n"
+            << "    visitor.visit(ext_cref_group);\n"
+            << "  }\n";
+      }
+      else
+        out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)[" << i << "]) );\n";
     }
 
     out_ << "}\n\n";
@@ -516,6 +533,7 @@ void inl_gen::visit(const mfast::group_field_instruction *inst, void *pIndex) {
 
     for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
       const field_instruction *subinst = inst->subinstructions()[i];
+
       out_ << "  visitor.visit(" << get_ext_mref_type(subinst) << " ((*this)["
            << i << "]) );\n";
     }
@@ -670,9 +688,17 @@ void inl_gen::visit(const mfast::sequence_field_instruction *inst,
 
     for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
       const field_instruction *subinst = inst->subinstructions()[i];
-      ;
-      out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)["
-           << i << "]) );\n";
+
+      if (is_group_type(subinst) && subinst->optional())
+      {
+        out_ << "  {\n"
+            << "    " << get_ext_cref_type(subinst) << " ext_cref_group((*this)[" << i << "]);\n"
+            << "    ext_cref_group.set_group_present(this->field_storage(" << i << ")->is_present());\n"
+            << "    visitor.visit(ext_cref_group);\n"
+            << "  }\n";
+      }
+      else
+        out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)[" << i << "]) );\n";
     }
 
     out_ << "}\n\n";
@@ -685,7 +711,7 @@ void inl_gen::visit(const mfast::sequence_field_instruction *inst,
 
     for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
       const field_instruction *subinst = inst->subinstructions()[i];
-      ;
+
       out_ << "  visitor.visit(" << get_ext_mref_type(subinst) << " ((*this)["
            << i << "]) );\n";
     }
@@ -798,9 +824,17 @@ void inl_gen::visit(const mfast::template_instruction *inst, void *) {
 
   for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
     const field_instruction *subinst = inst->subinstructions()[i];
-    ;
-    out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)["
-         << i << "]) );\n";
+
+    if (is_group_type(subinst) && subinst->optional())
+    {
+      out_ << "  {\n"
+          << "    " << get_ext_cref_type(subinst) << " ext_cref_group((*this)[" << i << "]);\n"
+          << "    ext_cref_group.set_group_present(this->field_storage(" << i << ")->is_present());\n"
+          << "    visitor.visit(ext_cref_group);\n"
+          << "  }\n";
+    }
+    else
+      out_ << "  visitor.visit(" << get_ext_cref_type(subinst) << " ((*this)[" << i << "]) );\n";
   }
 
   out_ << "}\n\n";
@@ -849,7 +883,7 @@ void inl_gen::visit(const mfast::template_instruction *inst, void *) {
 
   for (std::size_t i = 0; i < inst->subinstructions().size(); ++i) {
     const field_instruction *subinst = inst->subinstructions()[i];
-    ;
+
     out_ << "  visitor.visit(" << get_ext_mref_type(subinst) << " ((*this)["
          << i << "]) );\n";
   }

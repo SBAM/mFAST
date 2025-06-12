@@ -5,7 +5,7 @@ from pathlib import Path
 
 class MfastConan(ConanFile):
   name = "mfast"
-  version = "1.3.1"
+  version = "1.3.10"
   license = "BSD 3-Clause 'New' or 'Revised' License"
   author = "Object Computing, Inc. (info@ociweb.com)"
   url = "https://github.com/objectcomputing/mFAST"
@@ -23,15 +23,15 @@ class MfastConan(ConanFile):
                       "build_tests": False,
                       "build_examples": False,
                       "build_packages": False }
-  exports_sources = "CMakeLists.txt", "cmake/*", "src/*", "examples/*", "tests/*"
+  exports_sources = "cmake/*", "CMakeLists.txt", "examples/*", "schema/*", "src/*", "tests/*"
 
   def build_requirements(self):
     if self.options.build_tests:
-      self.test_requires("catch2/3.7.1")
+      self.test_requires("catch2/[>=3.8.1]")
 
   def requirements(self):
-    self.requires("boost/[>=1.69.0]")
-    self.requires("tinyxml2/10.0.0")
+    self.requires("boost/[>=1.78.0]")
+    self.requires("tinyxml2/[>=11.0.0]")
 
   def config_options(self):
     if self.options.shared:
@@ -47,8 +47,6 @@ class MfastConan(ConanFile):
     tc.variables["BUILD_EXAMPLES"] = "ON" if self.options.build_examples else "OFF"
     tc.variables["BUILD_PACKAGES"] = "ON" if self.options.build_packages else "OFF"
     tc.variables["BUILD_SHARED_LIBS"] = "ON" if self.options.shared else "OFF"
-    tc.variables["STATIC_GEN"] = "ON" if not self.options.shared else "OFF"
-    tc.variables["IS_CONAN2_BUILD"] = "ON"
     tc.generate()
 
   def build(self):

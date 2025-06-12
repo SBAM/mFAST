@@ -10,6 +10,8 @@
 #include "decimal_ref.h"
 #include "nested_message_ref.h"
 
+#include <type_traits>
+
 namespace mfast {
 template <int V> struct fast_operator_tag : std::integral_constant<int, V> {};
 
@@ -97,14 +99,11 @@ public:
   typedef BaseCRef cref_type;
   typedef typename cref_type::type_category type_category;
   typedef OpType operator_category;
-  typedef ext_ref_properties<OpType, Properties> ParentExtRefProp;
 
   explicit ext_cref(const field_cref &base) : base_(base) {}
   explicit ext_cref(const aggregate_cref &base) : base_(base) {}
   cref_type get() const { return base_; }
-  bool present() const {
-    return !static_cast<const ParentExtRefProp*>(this)->optional() || base_.present();
-  }
+  bool present() const { return !this->optional() || base_.present(); }
 
 private:
   cref_type base_;
@@ -131,10 +130,7 @@ public:
   exponent_type get_exponent() const {
     return exponent_type(base_.get_exponent());
   }
-  bool present() const {
-    return (!exponent_type::ParentExtRefProp::IsOptional &&
-            !mantissa_type::ParentExtRefProp::IsOptional) || base_.present();
-  }
+  bool present() const { return !base_.optional() || base_.present(); }
 
 private:
   decimal_cref base_;
@@ -153,6 +149,13 @@ public:
   explicit ext_cref(const field_cref &other) : base_(other) {}
   cref_type get() const { return base_; }
   length_type get_length(value_storage &storage) const {
+    if (std::is_same<typename LengthExtRef::operator_category, constant_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->initial_value();
+    else if (std::is_same<typename LengthExtRef::operator_category, copy_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->prev_value();
+    else if (std::is_same<typename LengthExtRef::operator_category, default_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->initial_or_default_value();
+
     uint32_mref length_mref(nullptr, &storage,
                             base_.instruction()->length_instruction());
     length_mref.as(base_.size());
@@ -163,6 +166,8 @@ public:
     return element_type(base_[i]);
   }
   std::size_t size() const { return base_.size(); }
+
+  bool present() const { return base_.present(); }
 
 private:
   sequence_cref base_;
@@ -189,6 +194,26 @@ protected:
   aggregate_cref base_;
 };
 
+template <typename BaseCRef, typename Properties>
+class ext_cref<BaseCRef, group_type_tag, Properties>
+    : public ext_ref_properties<group_type_tag, Properties> {
+public:
+  typedef BaseCRef cref_type;
+  typedef typename cref_type::type_category type_category;
+  typedef group_type_tag operator_category;
+
+  explicit ext_cref(const field_cref &base) : base_(base) {}
+  explicit ext_cref(const aggregate_cref &base) : base_(base) {}
+  cref_type get() const { return base_; }
+  bool present() const { return group_present_; }
+
+  void set_group_present(bool present) { group_present_ = present; }
+
+private:
+  cref_type base_;
+  bool group_present_ = this->optional()?false:true;
+};
+
 template <typename Properties>
 class ext_cref<nested_message_cref, group_type_tag, Properties>
     : public ext_ref_properties<group_type_tag, Properties> {
@@ -201,8 +226,11 @@ public:
   cref_type get() const { return cref_type(aggregate_cref(base_)[0]); }
   bool present() const { return !this->optional() || base_.present(); }
 
+  void set_group_present(bool present) { group_present_ = present; }
+
 private:
   field_cref base_;
+  bool group_present_ = true;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -222,12 +250,10 @@ public:
       storage->present(true);
     }
     return mref_type(base_);
-    ;
   }
 
   cref_type get() const {
     return cref_type(base_);
-    ;
   }
 
   bool present() const { return !this->optional() || base_.present(); }
@@ -316,6 +342,13 @@ public:
   cref_type get() const { return base_; }
   is_optional_type optional() const { return is_optional_type(); }
   length_type set_length(value_storage &storage) const {
+    if (std::is_same<typename LengthExtRef::operator_category, constant_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->initial_value();
+    else if (std::is_same<typename LengthExtRef::operator_category, copy_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->prev_value();
+    else if (std::is_same<typename LengthExtRef::operator_category, default_operator_tag>::value)
+      storage = base_.instruction()->length_instruction()->initial_or_default_value();
+
     field_mref_base length_mref(nullptr, &storage,
                                 base_.instruction()->length_instruction());
     return length_type(length_mref);

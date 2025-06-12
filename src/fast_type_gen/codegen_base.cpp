@@ -97,7 +97,7 @@ std::string codegen_base::cpp_name(const mfast::field_instruction *inst) {
 std::string codegen_base::cpp_name(std::string_view name)
 {
   std::string result;
-  if (!std::isalpha(name[0]))
+  if (name.empty() || !std::isalpha(name[0]))
     result = "_";
   std::transform(name.begin(), name.end(), std::back_inserter(result),
                  [] (char c) { return std::isalnum(c) ? c : '_'; });

@@ -1,12 +1,7 @@
 
-set(TEST_LIBS ${MFAST_LIBRARIES}
-              # ${Boost_SYSTEM_LIBRARY}
-    )
-
+set(TEST_LIBS mfast_static mfast_coder_static mfast_xml_parser_static)
 set(DATA_FILE "complex30000.dat")
 set(TEMPLATE_FILE "example.xml")
-
-
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     # SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
@@ -23,7 +18,7 @@ else()
        DIRECTORY
        PROPERTY COMPILE_DEFINITIONS DATA_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/${DATA_FILE}\" TEMPLATE_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/${TEMPLATE_FILE}\";
        )
-endif()
+endif(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 
 FASTTYPEGEN_TARGET(example example.xml)
 

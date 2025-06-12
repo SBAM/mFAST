@@ -129,6 +129,16 @@ inline void fast_encoder_impl::visit(group_cref cref, int) {
 
 inline void fast_encoder_impl::visit(sequence_cref cref, int) {
 
+  if (cref.instruction()->optional() && !cref.present()) {
+    if (cref.instruction()->length_instruction()->pmap_size() > 0)
+      this->current_->set_next_bit(false);
+    if (cref.instruction()->length_instruction()->field_operator() != operator_constant &&
+        cref.instruction()->length_instruction()->field_operator() != operator_default &&
+        cref.instruction()->length_instruction()->field_operator() != operator_copy)
+      strm_.encode_null();
+    return;
+  }
+
   value_storage storage;
 
   uint32_mref length_mref(nullptr, &storage,
@@ -179,7 +189,8 @@ void fast_encoder_impl::visit(message_cref cref, bool force_reset) {
   template_instruction *instruction = *this->find(template_id);
 
   if (instruction != nullptr) {
-    current_pmap().init(&this->strm_, std::max<std::size_t>(instruction->segment_pmap_size(), 1));
+    constexpr std::size_t template_id_bit = 1;
+    current_pmap().init(&this->strm_, std::max<std::size_t>(instruction->segment_pmap_size() + template_id_bit, 1));
   } else {
     using namespace coder;
     BOOST_THROW_EXCEPTION(fast_dynamic_error("D9")
@@ -194,14 +205,18 @@ void fast_encoder_impl::visit(message_cref cref, bool force_reset) {
 
   if (need_encode_template_id) {
     active_message_id_ = template_id;
-    strm_.encode(active_message_id_, false, false);
+    strm_.encode(template_id, false, false);
   }
 
   aggregate_cref message(cref.field_storage(0), instruction);
 
   for (auto &&field : message)
+  {
     if (field.present() || field.instruction()->field_operator() == operator_none)
       apply_accessor(*this, field);
+    else if (!field.present() && field.instruction()->pmap_size())
+      current_pmap().set_next_bit(false);
+  }
 
   pmap.commit();
 }

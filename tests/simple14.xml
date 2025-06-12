@@ -1,0 +1,73 @@
+<?xml version=\" 1.0 \"?>
+<templates xmlns="http://www.fixprotocol.org/ns/fast/td/1.1">
+    <template name="Test_1" id="1">
+        <sequence name="sequence_1" presence="optional">
+            <length name="field_1_1" id="12"><copy/></length>
+            <uInt32 name="field_1_2" id="13" presence="optional"><copy/></uInt32>
+        </sequence>
+        <uInt32 name="field_1_3" id="14" presence="optional"></uInt32>
+    </template>
+    <template name="Test_2" id="2">
+        <sequence name="sequence_2" presence="optional">
+            <length name="field_2_1" id="21"><constant value="1"/></length>
+            <uInt32 name="field_2_2" id="22" presence="optional"><copy/></uInt32>
+        </sequence>
+        <uInt32 name="field_2_3" id="23" presence="optional"></uInt32>
+    </template>
+    <template name="Test_3" id="3">
+        <sequence name="sequence_3" presence="optional">
+            <length name="field_3_1" id="31"><default value="1"/></length>
+            <uInt32 name="field_3_2" id="32" presence="optional"><copy/></uInt32>
+        </sequence>
+        <uInt32 name="field_3_3" id="33" presence="optional"></uInt32>
+    </template>
+    <template name="Test_4" id="4">
+        <sequence name="sequence_4" presence="optional">
+            <length name="field_4_1" id="41"></length>
+            <uInt32 name="field_4_2" id="42" presence="optional"><copy/></uInt32>
+        </sequence>
+        <uInt32 name="field_4_3" id="43" presence="optional"></uInt32>
+    </template>
+    <template name="Test_5" id="5">
+        <uInt32 name="field_5_1" id="51" presence="optional"><copy/></uInt32>
+        <uInt32 name="field_5_2" id="52"><copy/></uInt32>
+        <sequence name="sequence_5_1">
+            <length name="field_5_3" id="53"></length>
+            <uInt32 name="field_5_4" id="54" presence="optional"><copy/></uInt32>
+            <sequence name="sequence_5_2" presence="optional">
+                <length name="field_5_5" id="55"><copy/></length>
+                <uInt32 name="field_5_6" id="56"/>
+            </sequence>
+        </sequence>
+    </template>
+    <template name="Test_6" id="6">
+        <uInt32 name="field_6_1" id="61" presence="optional"><copy/></uInt32>
+        <group name="group_6">
+            <sequence name="sequence_6_1">
+                <length name="field_6_2" id="62"></length>
+                <uInt32 name="field_6_3" id="63"><copy/></uInt32>
+                <uInt32 name="field_6_4" id="64" presence="optional"><copy/></uInt32>
+                <sequence name="sequence_6_2" presence="optional">
+                    <length name="field_6_5" id="65"><copy/></length>
+                    <uInt32 name="field_6_6" id="66"/>
+                </sequence>
+            </sequence>
+        </group>
+    </template>
+    <template name="Test_7" id="7">
+        <sequence name="sequence_7">
+            <length name="field_7_2" id="72"></length>
+            <uInt32 name="field_7_3" id="73"><copy/></uInt32>
+            <group name="group_7" presence="optional">
+                <uInt32 name="field_7_4" id="74"/>
+            </group>
+        </sequence>
+    </template>
+    <template name="Test_8" id="8">
+        <sequence name="sequence_8">
+            <length name="field_8_1" id="81"></length>
+            <uInt32 name="field_8_2" id="82"><copy/></uInt32>
+            <decimal name="field_8_3" id="84" presence="optional"><delta/></decimal>
+        </sequence>
+    </template>
+</templates>

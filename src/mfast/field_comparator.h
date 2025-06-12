@@ -4,8 +4,9 @@
 // This file is part of mFAST.
 // See the file license.txt for licensing information.
 #pragma once
-#include <utility>
+
 #include "field_visitor.h"
+
 namespace mfast {
 namespace detail {
 class field_comparator {
@@ -68,5 +69,4 @@ inline bool operator==(const field_cref &lhs, const field_cref &rhs) {
   return apply_accessor(comparator, lhs);
 }
 
-using namespace std::rel_ops;
 }

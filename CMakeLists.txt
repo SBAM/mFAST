@@ -2,63 +2,87 @@
 # refer to the root source directory of the project as ${MFAST_SOURCE_DIR} and
 # to the root binary directory of the project as ${MFAST_BINARY_DIR}.
 
-cmake_minimum_required(VERSION 3.13)
-project (mFAST CXX)
+cmake_minimum_required(VERSION 3.23)
+project (mFAST VERSION 1.3.0 LANGUAGES CXX)
 
 # options to build tests, examples and packages
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_PACKAGES "Build packages" ON)
-option(STATIC_GEN "Static link fast type generator" OFF)
-option(IS_CONAN2_BUILD "Indicates if conan2 was used for build" OFF)
+# global options
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden) ## hidden visibility by default is good for everyone
+set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "build shared/dynamic library")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # debug build by default
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build" FORCE)
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(GNUInstallDirs)
+include(Emscripten)
+include(SetCompilerWarnings)
+include(SetupCoverage)
+include(FastTypeGenTarget)
 
-set(MFAST_MAJOR_VERSION 1)
-set(MFAST_MINOR_VERSION 3)
-set(MFAST_PATCH_VERSION 1)
-set(MFAST_VERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VERSION})
-set(MFAST_SOVERSION ${MFAST_MAJOR_VERSION}.${MFAST_MINOR_VERSION}.${MFAST_PATCH_VERSION})
+# detect conan context and forward tools.build:skip_test (BUILD_TESTING)
+set(IS_CONAN2_BUILD FALSE)
+string(FIND "${CMAKE_TOOLCHAIN_FILE}" "conan_toolchain.cmake" CONAN2_TOOLCHAIN_FOUND)
+if (NOT CONAN2_TOOLCHAIN_FOUND EQUAL -1)
+  set(IS_CONAN2_BUILD TRUE)
+  set(BUILD_TESTS ${BUILD_TESTING})
+endif()
 
-# Setup conan dependencies if available
+# dependencies
+find_package(Boost 1.56.0 REQUIRED)
 if (IS_CONAN2_BUILD)
-  find_package(Boost REQUIRED COMPONENTS headers)
-  find_package(tinyxml2 REQUIRED)
   if (BUILD_TESTS)
     find_package(Catch2 REQUIRED)
   endif()
-else()
-  find_package(Boost 1.59.0 REQUIRED)
-  include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml2)
-  include_directories ("${PROJECT_SOURCE_DIR}/src")
-  set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+  find_package(tinyxml2 REQUIRED)
 endif()
 
-include(SetInstallPaths)
-include(Emscripten)
-include(SetCXXStandard)
-include(SetCompilerWarnings)
-include(SetupCoverage)
+add_compile_definitions(SIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})
 
-# flag to enable building shared/dynamic library
-set(BUILD_SHARED_LIBS OFF CACHE BOOL "build shared/dynamic library")
+add_subdirectory (src)
 
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory (tests)
+endif(BUILD_TESTS)
+
+if(BUILD_EXAMPLES)
+  add_subdirectory (examples)
+endif(BUILD_EXAMPLES)
+
+# Setting up dist target
+set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${MFAST_VERSION})
+add_custom_target(dist
+    COMMAND git archive -o ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 --prefix=${ARCHIVE_NAME}/ HEAD
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+file(GLOB schema_files "${CMAKE_CURRENT_SOURCE_DIR}/schema/*.*")
+install(DIRECTORY
+        schema/
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/mfast)
+
+# keep at the end, after target definitions
+include(GenProjectConfig)
+
+# package support
 if(BUILD_PACKAGES)
   # Build deb package by default
   if(NOT CPACK_GENERATOR)
     set(CPACK_GENERATOR "DEB" CACHE STRING "List of generators.")
-  endif()
+  endif(NOT CPACK_GENERATOR)
 
   if(CUSTOM_INSTALL_PREFIX)
     set(CMAKE_INSTALL_PREFIX ${CUSTOM_INSTALL_PREFIX} CACHE STRING "Custom installation prefix.")
     set(CPACK_SET_DESTDIR true)
     set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
-  endif()
+  endif(CUSTOM_INSTALL_PREFIX)
 
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A FAST (FIX Adapted for STreaming) encoder/decoder")
   set(CPACK_PACKAGE_NAME "mfast")
@@ -69,47 +93,7 @@ if(BUILD_PACKAGES)
   set(CPACK_DEBIAN_PACKAGE_SECTION "devel")
 
   include(CPack)
-endif()
-
-add_definitions(-DSIZEOF_VOID_P=${CMAKE_SIZEOF_VOID_P})
-
-# variables to be used later
-set(MFAST_SHARED_LIBRARIES CACHE INTERNAL "")
-set(MFAST_STATIC_LIBRARIES CACHE INTERNAL "")
-set(MFAST_DYNAMIC_COMPONENTS CACHE INTERNAL "")
-set(MFAST_STATIC_COMPONENTS CACHE INTERNAL "")
-
-add_subdirectory (src)
-include(FastTypeGenTarget)
-
-if(BUILD_TESTS)
-  enable_testing()
-  add_subdirectory (tests)
-endif()
-
-if (BUILD_SHARED_LIBS)
-  set(MFAST_LIBRARIES "${MFAST_SHARED_LIBRARIES}")
-else()
-  set(MFAST_LIBRARIES "${MFAST_STATIC_LIBRARIES}")
-endif()
-
-if(BUILD_EXAMPLES)
-  add_subdirectory (examples)
-endif()
-
-# Setting up dist target
-set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${MFAST_VERSION})
-add_custom_target(dist
-    COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD
-        | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-include(GenProjectConfig)
-
-file(GLOB schema_files "${CMAKE_CURRENT_SOURCE_DIR}/schema/*.*")
-install(FILES
-        ${schema_files}
-        DESTINATION ${INSTALL_DATA_DIR}/mfast)
+endif(BUILD_PACKAGES)
 
 # Print summary
 message(STATUS "")
